@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import { FiCalendar, FiClock, FiUsers, FiInfo, FiCheck } from 'react-icons/fi'
@@ -39,11 +39,34 @@ export default function UserDashboard() {
     fetchBookings()
   }, [])
 
+  const fetchAvailableRooms = useCallback(async () => {
+    try {
+      const response = await fetch('/api/rooms/available', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date: selectedDate.format('YYYY-MM-DD'),
+          timeSlots: selectedTimeSlots
+        }),
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch available rooms')
+      }
+      const data = await response.json()
+      setAvailableRooms(data)
+    } catch (error) {
+      console.error('Error fetching available rooms:', error)
+      setError('Failed to load available rooms')
+    }
+  }, [selectedDate, selectedTimeSlots])
+
   useEffect(() => {
     if (selectedDate && selectedTimeSlots.length > 0) {
       fetchAvailableRooms()
     }
-  }, [selectedDate, selectedTimeSlots])
+  }, [selectedDate, selectedTimeSlots, fetchAvailableRooms])
 
   useEffect(() => {
     if (selectedRoom) {
@@ -84,29 +107,6 @@ export default function UserDashboard() {
     } catch (error) {
       console.error('Error fetching bookings:', error)
       setError('Failed to load bookings')
-    }
-  }
-
-  const fetchAvailableRooms = async () => {
-    try {
-      const response = await fetch('/api/rooms/available', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          date: selectedDate.format('YYYY-MM-DD'),
-          timeSlots: selectedTimeSlots
-        }),
-      })
-      if (!response.ok) {
-        throw new Error('Failed to fetch available rooms')
-      }
-      const data = await response.json()
-      setAvailableRooms(data)
-    } catch (error) {
-      console.error('Error fetching available rooms:', error)
-      setError('Failed to load available rooms')
     }
   }
 

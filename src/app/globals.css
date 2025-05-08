@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -23,4 +26,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom styles */
+.calendar {
+  @apply bg-white rounded-lg shadow-sm p-4;
+}
+
+.calendar .react-calendar__tile {
+  @apply rounded-md hover:bg-indigo-50 transition-colors duration-200;
+}
+
+.calendar .react-calendar__tile--active {
+  @apply bg-indigo-600 text-white;
 }

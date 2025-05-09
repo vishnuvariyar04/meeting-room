@@ -113,52 +113,52 @@ export default function AddRoomModal({ isOpen, onClose, onAdd }) {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
                       Room Name
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FiHome className="h-5 w-5 text-gray-400" />
+                        <FiHome className="h-5 w-5 text-gray-500" />
                       </div>
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200"
                         placeholder="Enter room name"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
                       Description
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FiInfo className="h-5 w-5 text-gray-400" />
+                        <FiInfo className="h-5 w-5 text-gray-500" />
                       </div>
                       <textarea
                         value={formData.description}
                         onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                         rows={3}
                         required
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200 resize-none"
                         placeholder="Enter room description"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
                       Capacity
                     </label>
                     <div className="relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FiUsers className="h-5 w-5 text-gray-400" />
+                        <FiUsers className="h-5 w-5 text-gray-500" />
                       </div>
                       <input
                         type="number"
@@ -166,39 +166,39 @@ export default function AddRoomModal({ isOpen, onClose, onAdd }) {
                         min="1"
                         value={formData.capacity}
                         onChange={(e) => setFormData(prev => ({ ...prev, capacity: e.target.value }))}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200"
                         placeholder="Enter room capacity"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
                       Amenities
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       {['Projector', 'Whiteboard', 'TV', 'Video Conferencing', 'Coffee Machine', 'WiFi'].map((amenity) => (
                         <label
                           key={amenity}
-                          className="flex items-center space-x-2 p-2 border rounded-md cursor-pointer hover:bg-gray-50"
+                          className="flex items-center space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
                         >
                           <input
                             type="checkbox"
                             checked={formData.amenities.includes(amenity)}
                             onChange={() => handleAmenityChange(amenity)}
-                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                           />
-                          <span className="text-sm text-gray-700">{amenity}</span>
+                          <span className="text-sm font-medium text-gray-900">{amenity}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mt-6">
+                  <div className="mt-8">
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                      className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 ${
                         loading ? 'opacity-75 cursor-not-allowed' : ''
                       }`}
                     >

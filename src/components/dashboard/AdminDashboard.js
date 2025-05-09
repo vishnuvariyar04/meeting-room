@@ -205,9 +205,19 @@ export default function AdminDashboard() {
                   activeTab === 'bookings'
                     ? 'border-indigo-500 text-indigo-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm relative`}
               >
                 Bookings
+                {bookings.filter(b => b.status === 'pending').length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-yellow-500 items-center justify-center">
+                      <span className="text-[10px] font-bold text-white">
+                        {bookings.filter(b => b.status === 'pending').length}
+                      </span>
+                    </span>
+                  </span>
+                )}
               </button>
             </nav>
           </div>

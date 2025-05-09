@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from 'react'
+import { FiX, FiHome, FiUsers, FiInfo } from 'react-icons/fi'
 
 const DEFAULT_AMENITIES = [
   'Projector',
@@ -16,188 +19,206 @@ const DEFAULT_AMENITIES = [
 export default function EditRoomModal({ isOpen, onClose, onEdit, room }) {
   const [formData, setFormData] = useState({
     name: '',
-    capacity: '',
     description: '',
-    amenities: [],
-    timeSlots: [],
+    capacity: '',
+    amenities: []
   })
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (room) {
       setFormData({
-        name: room.name,
-        capacity: room.capacity,
-        description: room.description,
-        amenities: room.amenities || [],
-        timeSlots: room.availableTimeSlots,
+        name: room.name || '',
+        description: room.description || '',
+        capacity: room.capacity || '',
+        amenities: room.amenities || []
       })
     }
   }, [room])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    onEdit(room._id, formData)
-  }
+    setLoading(true)
+    setError(null)
 
-  const handleAddTimeSlot = () => {
-    setFormData({
-      ...formData,
-      timeSlots: [
-        ...formData.timeSlots,
-        { startTime: '09:00', endTime: '10:00' },
-      ],
-    })
-  }
-
-  const handleRemoveTimeSlot = (index) => {
-    setFormData({
-      ...formData,
-      timeSlots: formData.timeSlots.filter((_, i) => i !== index),
-    })
-  }
-
-  const handleTimeSlotChange = (index, field, value) => {
-    const newTimeSlots = [...formData.timeSlots]
-    newTimeSlots[index] = { ...newTimeSlots[index], [field]: value }
-    setFormData({ ...formData, timeSlots: newTimeSlots })
+    try {
+      await onEdit(room._id, {
+        ...formData,
+        capacity: parseInt(formData.capacity)
+      })
+      onClose()
+    } catch (error) {
+      console.error('Error updating room:', error)
+      setError('Failed to update room. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleAmenityChange = (amenity) => {
-    setFormData({
-      ...formData,
-      amenities: formData.amenities.includes(amenity)
-        ? formData.amenities.filter((a) => a !== amenity)
-        : [...formData.amenities, amenity],
-    })
+    setFormData(prev => ({
+      ...prev,
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter(a => a !== amenity)
+        : [...prev.amenities, amenity]
+    }))
   }
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-6">Edit Room</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Room Name
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter room name"
-            />
-          </div>
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-10" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </Transition.Child>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Capacity
-            </label>
-            <input
-              type="number"
-              required
-              min="1"
-              value={formData.capacity}
-              onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter room capacity"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              required
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              rows="3"
-              placeholder="Enter room description"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amenities
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {DEFAULT_AMENITIES.map((amenity) => (
-                <label key={amenity} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={() => handleAmenityChange(amenity)}
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <span className="text-sm text-gray-700">{amenity}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Available Time Slots
-              </label>
-              <button
-                type="button"
-                onClick={handleAddTimeSlot}
-                className="text-sm text-indigo-600 hover:text-indigo-500"
-              >
-                Add Time Slot
-              </button>
-            </div>
-            <div className="space-y-2">
-              {formData.timeSlots.map((slot, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input
-                    type="time"
-                    value={slot.startTime}
-                    onChange={(e) => handleTimeSlotChange(index, 'startTime', e.target.value)}
-                    className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <span>to</span>
-                  <input
-                    type="time"
-                    value={slot.endTime}
-                    onChange={(e) => handleTimeSlotChange(index, 'endTime', e.target.value)}
-                    className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <div className="flex justify-between items-center mb-4">
+                  <Dialog.Title as="h3" className="text-xl font-semibold text-gray-900">
+                    Edit Room
+                  </Dialog.Title>
                   <button
-                    type="button"
-                    onClick={() => handleRemoveTimeSlot(index)}
-                    className="text-red-600 hover:text-red-500"
+                    onClick={onClose}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
                   >
-                    Remove
+                    <FiX className="h-6 w-6" />
                   </button>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Save Changes
-            </button>
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      Room Name
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FiHome className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200"
+                        placeholder="Enter room name"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      Description
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FiInfo className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        rows={3}
+                        required
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200 resize-none"
+                        placeholder="Enter room description"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      Capacity
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FiUsers className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={formData.capacity}
+                        onChange={(e) => setFormData(prev => ({ ...prev, capacity: e.target.value }))}
+                        className="block w-full pl-10 pr-3 py-2.5 border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors duration-200"
+                        placeholder="Enter room capacity"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      Amenities
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {['Projector', 'Whiteboard', 'TV', 'Video Conferencing', 'Coffee Machine', 'WiFi'].map((amenity) => (
+                        <label
+                          key={amenity}
+                          className="flex items-center space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.amenities.includes(amenity)}
+                            onChange={() => handleAmenityChange(amenity)}
+                            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          <span className="text-sm font-medium text-gray-900">{amenity}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 ${
+                        loading ? 'opacity-75 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {loading ? (
+                        <div className="flex items-center">
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Updating Room...
+                        </div>
+                      ) : (
+                        'Update Room'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </Dialog>
+    </Transition>
   )
 } 

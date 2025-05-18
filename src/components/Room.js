@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiUsers, FiInfo, FiCheck } from 'react-icons/fi'
+import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiUsers, FiInfo, FiCheck, FiImage } from 'react-icons/fi'
 import BookRoomModal from './modals/BookRoomModal'
 import EditRoomModal from './modals/EditRoomModal'
 
 export default function Room({ room, onEdit, onDelete, isAdmin = false }) {
   const [isBookModalOpen, setIsBookModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   const handleEdit = async (updatedRoom) => {
     await onEdit(updatedRoom)
@@ -16,6 +17,32 @@ export default function Room({ room, onEdit, onDelete, isAdmin = false }) {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {room.images && room.images.length > 0 ? (
+        <div className="relative h-48 bg-gray-100">
+          <img
+            src={room.images[selectedImageIndex]}
+            alt={`${room.name} - Image ${selectedImageIndex + 1}`}
+            className="w-full h-full object-cover"
+          />
+          {room.images.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {room.images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImageIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                    selectedImageIndex === index ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="h-48 bg-gray-100 flex items-center justify-center">
+          <FiImage className="w-12 h-12 text-gray-400" />
+        </div>
+      )}
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -122,30 +149,27 @@ export default function Room({ room, onEdit, onDelete, isAdmin = false }) {
 
             <button
               onClick={() => setIsBookModalOpen(true)}
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+              className="w-full mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center justify-center"
             >
+              <FiCalendar className="w-5 h-5 mr-2" />
               Book Room
             </button>
           </div>
         )}
       </div>
 
-      {!isAdmin && (
-        <BookRoomModal
-          isOpen={isBookModalOpen}
-          onClose={() => setIsBookModalOpen(false)}
-          room={room}
-        />
-      )}
+      <BookRoomModal
+        isOpen={isBookModalOpen}
+        onClose={() => setIsBookModalOpen(false)}
+        room={room}
+      />
 
-      {isAdmin && (
-        <EditRoomModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onEdit={handleEdit}
-          room={room}
-        />
-      )}
+      <EditRoomModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onEdit={handleEdit}
+        room={room}
+      />
     </div>
   )
 } 

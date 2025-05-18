@@ -18,6 +18,10 @@ const roomSchema = new mongoose.Schema({
     type: String,
     required: true,
   }],
+  images: [{
+    type: String,
+    required: true,
+  }],
   availableTimeSlots: [
     {
       startTime: {

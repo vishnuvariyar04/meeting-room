@@ -38,7 +38,7 @@ export async function POST(req) {
     }
 
     const body = await req.json()
-    const { name, description, capacity, amenities, availableTimeSlots } = body
+    const { name, description, capacity, amenities, availableTimeSlots, images } = body
 
     if (!name || !description || !capacity || !amenities || !availableTimeSlots) {
       return NextResponse.json(
@@ -54,7 +54,8 @@ export async function POST(req) {
       description,
       capacity,
       amenities,
-      availableTimeSlots
+      availableTimeSlots,
+      images: images || []
     })
 
     return NextResponse.json(room)

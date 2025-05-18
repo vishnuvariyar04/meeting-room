@@ -3,12 +3,21 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
-import { FiCalendar, FiClock, FiUsers, FiInfo, FiCheck } from 'react-icons/fi'
+import { FiCalendar, FiClock, FiUsers, FiInfo, FiCheck, FiImage, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import * as React from 'react'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
 import dayjs from 'dayjs'
+
+// Helper function to calculate hours between two times
+const calculateHours = (startTime, endTime) => {
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = endHour * 60 + endMinute;
+  return (endTotalMinutes - startTotalMinutes) / 60;
+};
 
 export default function UserDashboard() {
   const { data: session } = useSession()
@@ -33,6 +42,7 @@ export default function UserDashboard() {
     amenities: [],
     searchQuery: ''
   })
+  const [activeImageIndices, setActiveImageIndices] = useState({})
 
   useEffect(() => {
     fetchRooms()
@@ -337,6 +347,44 @@ export default function UserDashboard() {
     })
   }
 
+  const handlePrevImage = (roomId, e) => {
+    e.stopPropagation()
+    setActiveImageIndices(prev => {
+      const currentIndex = prev[roomId] || 0
+      const room = rooms.find(r => r._id === roomId)
+      const newIndex = currentIndex === 0 ? room.images.length - 1 : currentIndex - 1
+      return { ...prev, [roomId]: newIndex }
+    })
+  }
+
+  const handleNextImage = (roomId, e) => {
+    e.stopPropagation()
+    setActiveImageIndices(prev => {
+      const currentIndex = prev[roomId] || 0
+      const room = rooms.find(r => r._id === roomId)
+      const newIndex = currentIndex === room.images.length - 1 ? 0 : currentIndex + 1
+      return { ...prev, [roomId]: newIndex }
+    })
+  }
+
+  const getMonthlyBookedHours = () => {
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const monthlyBookings = bookings.filter(booking => {
+      const bookingDate = new Date(booking.date);
+      return bookingDate >= firstDayOfMonth && bookingDate <= lastDayOfMonth;
+    });
+
+    let totalHours = 0;
+    monthlyBookings.forEach(booking => {
+      totalHours += calculateHours(booking.startTime, booking.endTime);
+    });
+
+    return totalHours.toFixed(1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -570,6 +618,45 @@ export default function UserDashboard() {
                             !room.isAvailable ? 'opacity-60 grayscale' : ''
                           }`}
                         >
+                          {room.images && room.images.length > 0 ? (
+                            <div className="relative h-48 mb-4 rounded-lg overflow-hidden group">
+                              <img
+                                src={room.images[activeImageIndices[room._id] || 0]}
+                                alt={`${room.name} - Room Image ${(activeImageIndices[room._id] || 0) + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              {room.images.length > 1 && (
+                                <>
+                                  <button
+                                    onClick={(e) => handlePrevImage(room._id, e)}
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <FiChevronLeft className="w-6 h-6" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => handleNextImage(room._id, e)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <FiChevronRight className="w-6 h-6" />
+                                  </button>
+                                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                    {room.images.map((_, index) => (
+                                      <div
+                                        key={index}
+                                        className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                                          (activeImageIndices[room._id] || 0) === index ? 'bg-white' : 'bg-white/50'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="h-48 mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <FiImage className="w-12 h-12 text-gray-400" />
+                            </div>
+                          )}
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h3 className="text-lg font-bold text-gray-900">
@@ -634,7 +721,14 @@ export default function UserDashboard() {
 
         {activeTab === 'bookings' && (
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">My Bookings</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">My Bookings</h2>
+              <div className="bg-indigo-50 px-4 py-2 rounded-lg">
+                <p className="text-sm text-indigo-700">
+                  <span className="font-semibold">Monthly Booking Hours:</span> {getMonthlyBookedHours()} / 8 hours
+                </p>
+              </div>
+            </div>
             {bookings.length === 0 ? (
               <div className="text-center py-12">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 mb-4">
@@ -814,6 +908,45 @@ export default function UserDashboard() {
                       }`}
                       onClick={() => handleSelectRoom(room)}
                     >
+                      {room.images && room.images.length > 0 ? (
+                        <div className="relative h-48 mb-4 rounded-lg overflow-hidden group">
+                          <img
+                            src={room.images[activeImageIndices[room._id] || 0]}
+                            alt={`${room.name} - Room Image ${(activeImageIndices[room._id] || 0) + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {room.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => handlePrevImage(room._id, e)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronLeft className="w-6 h-6" />
+                              </button>
+                              <button
+                                onClick={(e) => handleNextImage(room._id, e)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronRight className="w-6 h-6" />
+                              </button>
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                {room.images.map((_, index) => (
+                                  <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                                      (activeImageIndices[room._id] || 0) === index ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="h-48 mb-4 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <FiImage className="w-12 h-12 text-gray-400" />
+                        </div>
+                      )}
                       <div>
                         <h3 className="text-lg font-bold text-gray-900">{room.name}</h3>
                         <p className="text-gray-600 text-sm mb-3 italic border-l-4 border-indigo-200 pl-3">
@@ -882,6 +1015,43 @@ export default function UserDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Date</h3>
+                    {selectedRoom?.images && selectedRoom.images.length > 0 && (
+                      <div className="mb-4">
+                        <div className="relative h-64 rounded-lg overflow-hidden group">
+                          <img
+                            src={selectedRoom.images[activeImageIndices[selectedRoom._id] || 0]}
+                            alt={`${selectedRoom.name} - Room Image ${(activeImageIndices[selectedRoom._id] || 0) + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {selectedRoom.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => handlePrevImage(selectedRoom._id, e)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronLeft className="w-6 h-6" />
+                              </button>
+                              <button
+                                onClick={(e) => handleNextImage(selectedRoom._id, e)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronRight className="w-6 h-6" />
+                              </button>
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                {selectedRoom.images.map((_, index) => (
+                                  <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                                      (activeImageIndices[selectedRoom._id] || 0) === index ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateCalendar

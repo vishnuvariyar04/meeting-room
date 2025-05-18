@@ -23,6 +23,10 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  timeSlots: [{
+    startTime: String,
+    endTime: String
+  }],
   purpose: {
     type: String,
     default: '',

@@ -6,6 +6,23 @@ import Room from '@/models/Room'
 import connectDB from '@/lib/mongodb'
 import { sendBookingConfirmation, sendAdminNotification, sendApprovalRequest } from '@/lib/email'
 
+// Helper function to calculate hours between two times
+const calculateHours = (startTime, endTime) => {
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = endHour * 60 + endMinute;
+  return (endTotalMinutes - startTotalMinutes) / 60;
+};
+
+// Helper function to check if room requires admin approval
+const requiresAdminApproval = (roomName) => {
+  const roomNameLower = roomName.toLowerCase();
+  return roomNameLower.includes('auditorium') || 
+         roomNameLower.includes('conference room') ||
+         roomNameLower.includes('conference');
+};
+
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -74,6 +91,47 @@ export async function POST(req) {
     const startTime = sortedTimeSlots[0].startTime
     const endTime = sortedTimeSlots[sortedTimeSlots.length - 1].endTime
 
+    // Calculate hours for the new booking
+    const newBookingHours = calculateHours(startTime, endTime);
+    console.log('New booking hours:', newBookingHours);
+
+    // Get month range for the booking date
+    const bookingDate = new Date(date);
+    const firstDayOfMonth = new Date(bookingDate.getFullYear(), bookingDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(bookingDate.getFullYear(), bookingDate.getMonth() + 1, 0);
+
+    // Get all approved and pending bookings for the user in the current month
+    const monthlyBookings = await Booking.find({
+      user: session.user.id,
+      date: {
+        $gte: firstDayOfMonth.toISOString().split('T')[0],
+        $lte: lastDayOfMonth.toISOString().split('T')[0]
+      },
+      status: { $in: ['approved', 'pending'] }
+    });
+
+    console.log('Found monthly bookings:', monthlyBookings.length);
+
+    // Calculate total hours booked this month
+    let totalMonthlyHours = 0;
+    monthlyBookings.forEach(booking => {
+      const bookingHours = calculateHours(booking.startTime, booking.endTime);
+      console.log('Booking hours:', bookingHours);
+      totalMonthlyHours += bookingHours;
+    });
+
+    console.log('Total monthly hours:', totalMonthlyHours);
+    console.log('New booking hours:', newBookingHours);
+    console.log('Total after new booking:', totalMonthlyHours + newBookingHours);
+
+    // Check if adding new booking would exceed 8 hours
+    if (totalMonthlyHours + newBookingHours > 8) {
+      return NextResponse.json(
+        { message: `You have already booked ${totalMonthlyHours.toFixed(1)} hours this month. Adding this booking of ${newBookingHours.toFixed(1)} hours would exceed the 8-hour limit. Please contact the admin for additional bookings.` },
+        { status: 400 }
+      )
+    }
+
     // Check for overlapping bookings
     const overlappingBookings = await Booking.find({
       room: roomId,
@@ -98,8 +156,15 @@ export async function POST(req) {
       )
     }
 
-    // Set initial status based on user role
-    const initialStatus = session.user.role === 'incubated' ? 'approved' : 'pending'
+    // Set initial status based on user role and room type
+    let initialStatus;
+    if (session.user.role === 'incubated') {
+      // For incubated users, check if the room requires admin approval
+      initialStatus = requiresAdminApproval(room.name) ? 'pending' : 'approved';
+    } else {
+      // For external users, always require admin approval
+      initialStatus = 'pending';
+    }
 
     // Create booking
     const booking = await Booking.create({
@@ -129,14 +194,14 @@ export async function POST(req) {
       bookingId: populatedBooking._id.toString()
     }
 
-    // Send appropriate emails based on user role
-    if (session.user.role === 'incubated') {
+    // Send appropriate emails based on booking status
+    if (initialStatus === 'approved') {
       // Send confirmation to incubated user
       await sendBookingConfirmation(session.user.email, bookingDetails)
       // Send notification to admin
       await sendAdminNotification(process.env.ADMIN_EMAIL, bookingDetails)
     } else {
-      // Send approval request to admin for external user
+      // Send approval request to admin
       await sendApprovalRequest(process.env.ADMIN_EMAIL, bookingDetails)
     }
 

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import Booking from '@/models/Booking'
 import connectDB from '@/lib/mongodb'
+import { sendApprovalStatus } from '@/lib/email'
 
 export async function PATCH(req, { params }) {
   try {
@@ -49,6 +50,21 @@ export async function PATCH(req, { params }) {
     const updatedBooking = await Booking.findById(id)
       .populate('room', 'name capacity')
       .populate('user', 'name email startupName')
+
+    // Prepare booking details for email
+    const bookingDetails = {
+      roomName: updatedBooking.room.name,
+      userName: updatedBooking.user.name,
+      date: updatedBooking.date,
+      startTime: updatedBooking.startTime,
+      endTime: updatedBooking.endTime,
+      purpose: updatedBooking.purpose,
+      bookingId: updatedBooking._id.toString()
+    }
+
+    // Send status notification emails
+    await sendApprovalStatus(updatedBooking.user.email, bookingDetails, status)
+    await sendApprovalStatus(process.env.ADMIN_EMAIL, bookingDetails, status)
 
     return NextResponse.json(updatedBooking)
   } catch (error) {

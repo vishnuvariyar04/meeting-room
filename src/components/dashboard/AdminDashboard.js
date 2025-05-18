@@ -18,8 +18,33 @@ export default function AdminDashboard() {
   const [isEditRoomModalOpen, setIsEditRoomModalOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [error, setError] = useState(null)
+  const [highlightedBookingId, setHighlightedBookingId] = useState(null)
 
   useEffect(() => {
+    // Get URL parameters
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    const status = params.get('status')
+    const bookingId = params.get('bookingId')
+    const error = params.get('error')
+
+    if (tab === 'bookings') {
+      setActiveTab('bookings')
+      if (status) {
+        setBookingTab(status)
+      }
+      if (bookingId) {
+        setHighlightedBookingId(bookingId)
+        // Remove highlight after 5 seconds
+        setTimeout(() => setHighlightedBookingId(null), 5000)
+      }
+      if (error) {
+        setError(error)
+        // Clear error after 5 seconds
+        setTimeout(() => setError(null), 5000)
+      }
+    }
+
     fetchRooms()
     fetchBookings()
   }, [])
@@ -185,6 +210,12 @@ export default function AdminDashboard() {
             Sign out
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
 
         <div className="mb-6">
           <div className="border-b border-gray-200">
@@ -370,7 +401,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Booking Content */}
-                <div className="space-y-4">
+                <div className="mt-6">
                   {bookings
                     .filter(booking => {
                       if (bookingTab === 'completed') {
@@ -381,12 +412,18 @@ export default function AdminDashboard() {
                     })
                     .sort((a, b) => new Date(a.date) - new Date(b.date))
                     .map((booking) => (
-                      <BookingCard
+                      <div
                         key={booking._id}
-                        booking={booking}
-                        onApprove={() => handleApproveBooking(booking._id)}
-                        onReject={() => handleRejectBooking(booking._id)}
-                      />
+                        className={`bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 ${
+                          highlightedBookingId === booking._id ? 'ring-2 ring-indigo-500' : ''
+                        }`}
+                      >
+                        <BookingCard
+                          booking={booking}
+                          onApprove={() => handleApproveBooking(booking._id)}
+                          onReject={() => handleRejectBooking(booking._id)}
+                        />
+                      </div>
                     ))}
                   {bookings.filter(booking => {
                     if (bookingTab === 'completed') {
@@ -435,91 +472,89 @@ const BookingCard = ({ booking, onApprove, onReject }) => {
     new Date(`${booking.date}T${booking.endTime}`) < new Date();
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-      <div className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                {booking.room?.name}
-              </h3>
-              <span
-                className={`px-2 sm:px-3 py-1 text-xs font-semibold rounded-full ${
-                  isCompleted
-                    ? 'bg-blue-100 text-blue-800'
-                    : booking.status === 'approved'
-                    ? 'bg-green-100 text-green-800'
-                    : booking.status === 'rejected'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}
-              >
-                {isCompleted ? 'Completed' : booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+              {booking.room?.name}
+            </h3>
+            <span
+              className={`px-2 sm:px-3 py-1 text-xs font-semibold rounded-full ${
+                isCompleted
+                  ? 'bg-blue-100 text-blue-800'
+                  : booking.status === 'approved'
+                  ? 'bg-green-100 text-green-800'
+                  : booking.status === 'rejected'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}
+            >
+              {isCompleted ? 'Completed' : booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
+            <div className="flex items-center text-gray-600">
+              <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500" />
+              <span className="text-sm sm:text-base">
+                {new Date(booking.date).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
-              <div className="flex items-center text-gray-600">
-                <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500" />
-                <span className="text-sm sm:text-base">
-                  {new Date(booking.date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <FiClock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500" />
-                <span className="text-sm sm:text-base">{booking.startTime} - {booking.endTime}</span>
+            <div className="flex items-center text-gray-600">
+              <FiClock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500" />
+              <span className="text-sm sm:text-base">{booking.startTime} - {booking.endTime}</span>
+            </div>
+          </div>
+          <div className="mt-3 sm:mt-4">
+            <div className="flex items-start">
+              <FiUsers className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500 mt-1" />
+              <div>
+                <p className="text-sm sm:text-base text-gray-900 font-medium">{booking.user?.name}</p>
+                <p className="text-xs sm:text-sm text-gray-500">{booking.user?.email}</p>
+                {booking.user?.startupName && (
+                  <p className="text-xs sm:text-sm text-indigo-600 font-medium mt-1">
+                    {booking.user.startupName}
+                  </p>
+                )}
               </div>
             </div>
+          </div>
+          {booking.purpose && (
             <div className="mt-3 sm:mt-4">
               <div className="flex items-start">
-                <FiUsers className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500 mt-1" />
-                <div>
-                  <p className="text-sm sm:text-base text-gray-900 font-medium">{booking.user?.name}</p>
-                  <p className="text-xs sm:text-sm text-gray-500">{booking.user?.email}</p>
-                  {booking.user?.startupName && (
-                    <p className="text-xs sm:text-sm text-indigo-600 font-medium mt-1">
-                      {booking.user.startupName}
-                    </p>
-                  )}
-                </div>
+                <FiInfo className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500 mt-1" />
+                <p className="text-xs sm:text-sm text-gray-600 italic">
+                  {booking.purpose}
+                </p>
               </div>
-            </div>
-            {booking.purpose && (
-              <div className="mt-3 sm:mt-4">
-                <div className="flex items-start">
-                  <FiInfo className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-500 mt-1" />
-                  <p className="text-xs sm:text-sm text-gray-600 italic">
-                    {booking.purpose}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-          {booking.status === 'pending' && (
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:ml-4">
-              <button
-                onClick={onApprove}
-                className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center"
-              >
-                <FiCheck className="w-4 h-4 mr-2" />
-                Approve
-              </button>
-              <button
-                onClick={onReject}
-                className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Reject
-              </button>
             </div>
           )}
         </div>
+        {booking.status === 'pending' && (
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:ml-4">
+            <button
+              onClick={onApprove}
+              className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center"
+            >
+              <FiCheck className="w-4 h-4 mr-2" />
+              Approve
+            </button>
+            <button
+              onClick={onReject}
+              className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Reject
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

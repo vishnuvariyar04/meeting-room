@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import Booking from '@/models/Booking'
 import Room from '@/models/Room'
 import connectDB from '@/lib/mongodb'
+import { sendBookingConfirmation, sendAdminNotification, sendApprovalRequest } from '@/lib/email'
 
 export async function GET(req) {
   try {
@@ -116,6 +117,28 @@ export async function POST(req) {
     const populatedBooking = await Booking.findById(booking._id)
       .populate('room')
       .populate('user', 'name email startupName role')
+
+    // Prepare booking details for email
+    const bookingDetails = {
+      roomName: populatedBooking.room.name,
+      userName: populatedBooking.user.name,
+      date: populatedBooking.date,
+      startTime: populatedBooking.startTime,
+      endTime: populatedBooking.endTime,
+      purpose: populatedBooking.purpose,
+      bookingId: populatedBooking._id.toString()
+    }
+
+    // Send appropriate emails based on user role
+    if (session.user.role === 'incubated') {
+      // Send confirmation to incubated user
+      await sendBookingConfirmation(session.user.email, bookingDetails)
+      // Send notification to admin
+      await sendAdminNotification(process.env.ADMIN_EMAIL, bookingDetails)
+    } else {
+      // Send approval request to admin for external user
+      await sendApprovalRequest(process.env.ADMIN_EMAIL, bookingDetails)
+    }
 
     return NextResponse.json(populatedBooking)
   } catch (error) {

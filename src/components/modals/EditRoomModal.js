@@ -306,7 +306,7 @@ export default function EditRoomModal({ isOpen, onClose, onEdit, room }) {
                     <button
                       type="submit"
                       disabled={loading || uploadingImage}
-                      className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                      className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
                     >
                       {loading ? 'Saving...' : 'Save Changes'}
                     </button>

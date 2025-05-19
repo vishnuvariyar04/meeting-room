@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { FiUser, FiMail, FiLock, FiHome, FiAlertCircle } from 'react-icons/fi'
 
 export default function Register() {
@@ -45,23 +46,39 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{' '}
-          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            sign in to your account
-          </Link>
-        </p>
+        <div className="flex justify-center">
+          <Image 
+            src="/Fiire_logo.jpeg" 
+            alt="Fiire Logo" 
+            width={120}
+            height={120}
+            className="object-contain"
+            priority
+          />
+        </div>
+        <div className="mt-6 text-center">
+          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
+            Create Account
+          </h2>
+          <div className="mt-2 flex items-center justify-center space-x-2">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-gray-300"></div>
+            <p className="text-sm text-gray-500">
+              Or{' '}
+              <Link href="/login" className="font-medium text-[#FF6B00] hover:text-[#FF8F3F] transition-colors duration-200">
+                sign in to your account
+              </Link>
+            </p>
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-gray-300"></div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
           {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <FiAlertCircle className="h-5 w-5 text-red-400" />
@@ -78,9 +95,9 @@ export default function Register() {
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
               </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="h-5 w-5 text-gray-400" />
+                  <FiUser className="h-5 w-5 text-[#FF6B00]" />
                 </div>
                 <input
                   id="name"
@@ -89,7 +106,7 @@ export default function Register() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 placeholder-gray-500"
+                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="John Doe"
                 />
               </div>
@@ -99,9 +116,9 @@ export default function Register() {
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiMail className="h-5 w-5 text-gray-400" />
+                  <FiMail className="h-5 w-5 text-[#FF6B00]" />
                 </div>
                 <input
                   id="email"
@@ -111,7 +128,7 @@ export default function Register() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 placeholder-gray-500"
+                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="you@example.com"
                 />
               </div>
@@ -121,9 +138,9 @@ export default function Register() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-gray-400" />
+                  <FiLock className="h-5 w-5 text-[#FF6B00]" />
                 </div>
                 <input
                   id="password"
@@ -133,7 +150,7 @@ export default function Register() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 placeholder-gray-500"
+                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="••••••••"
                 />
               </div>
@@ -143,9 +160,9 @@ export default function Register() {
               <label htmlFor="startupName" className="block text-sm font-medium text-gray-700">
                 Startup Name
               </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiHome className="h-5 w-5 text-gray-400" />
+                  <FiHome className="h-5 w-5 text-[#FF6B00]" />
                 </div>
                 <input
                   id="startupName"
@@ -154,7 +171,7 @@ export default function Register() {
                   required
                   value={formData.startupName}
                   onChange={(e) => setFormData({ ...formData, startupName: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white text-gray-900 placeholder-gray-500"
+                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="Your Startup Name"
                 />
               </div>
@@ -170,7 +187,7 @@ export default function Register() {
                 required
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white text-gray-900"
+                className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm rounded-xl bg-white text-gray-900 transition-colors duration-200"
               >
                 <option value="incubated">Incubated Startup</option>
                 <option value="external">External User</option>
@@ -181,7 +198,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] hover:from-[#FF8F3F] hover:to-[#FF6B00] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 ${
                   loading ? 'opacity-75 cursor-not-allowed' : ''
                 }`}
               >

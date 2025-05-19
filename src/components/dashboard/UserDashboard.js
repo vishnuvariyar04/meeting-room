@@ -503,23 +503,61 @@ export default function UserDashboard() {
                           onChange={(newDate) => setSelectedDate(newDate)}
                           minDate={dayjs()}
                           sx={{
+                            width: '100%',
+                            '.MuiPickersCalendarHeader-root': {
+                              marginBottom: '16px',
+                              padding: '0 8px'
+                            },
                             '.MuiPickersCalendarHeader-label': {
                               color: '#111827',
                               fontWeight: 600,
                               fontSize: '1.1rem'
                             },
                             '.MuiPickersDay-root': {
-                              color: '#374151'
-                            },
-                            '.MuiPickersDay-root.Mui-selected': {
-                              backgroundColor: '#FF6B00',
-                              color: 'white',
+                              color: '#374151',
+                              fontSize: '0.875rem',
+                              fontWeight: 500,
+                              margin: '2px',
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '8px',
                               '&:hover': {
-                                backgroundColor: '#FF8F3F'
+                                backgroundColor: '#FFF5EB',
+                                color: '#FF6B00'
+                              },
+                              '&.Mui-selected': {
+                                backgroundColor: '#FF6B00',
+                                color: 'white',
+                                '&:hover': {
+                                  backgroundColor: '#FF8F3F'
+                                }
+                              },
+                              '&.Mui-disabled': {
+                                color: '#9CA3AF'
                               }
                             },
-                            '.MuiPickersDay-root.Mui-disabled': {
-                              color: '#9CA3AF'
+                            '.MuiPickersDay-today': {
+                              border: '2px solid #FF6B00',
+                              color: '#FF6B00',
+                              '&.Mui-selected': {
+                                color: 'white'
+                              }
+                            },
+                            '.MuiPickersCalendarHeader-switchHeader': {
+                              marginTop: '8px'
+                            },
+                            '.MuiPickersArrowSwitcher-root': {
+                              margin: '0 8px'
+                            },
+                            '.MuiPickersArrowSwitcher-button': {
+                              color: '#FF6B00',
+                              '&:hover': {
+                                backgroundColor: '#FFF5EB'
+                              }
+                            },
+                            '.MuiPickersCalendarHeader-labelContainer': {
+                              marginLeft: '4px',
+                              marginRight: '4px'
                             }
                           }}
                         />
@@ -794,14 +832,11 @@ export default function UserDashboard() {
                                 />
                               </div>
                               <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSelectRoom(room);
-                                }}
-                                className="w-full py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2"
+                              onClick={() => handleBookRoom(room._id)}
+                                  className="w-full py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium"
                               >
-                                <FiCalendar className="w-4 h-4" />
-                                <span>Book This Room</span>
+                                <FiCheck className="inline-block mr-2" />
+                                Book Now
                               </button>
                             </div>
                           )}

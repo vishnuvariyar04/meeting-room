@@ -42,32 +42,37 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Image 
             src="/Fiire_logo.jpeg" 
             alt="Fiire Logo" 
-            width={120}
-            height={120}
+            width={100}
+            height={100}
             className="object-contain"
             priority
           />
         </div>
-        <div className="mt-6 text-center">
-          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
+        <div className="mt-4 text-center">
+          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
             Welcome Back
           </h2>
           <div className="mt-2 flex items-center justify-center space-x-2">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-gray-300"></div>
-            <p className="text-sm text-gray-500">Sign in to your account to continue</p>
+            <p className="text-sm text-gray-500">
+              Or{' '}
+              <Link href="/register" className="font-medium text-[#FF6B00] hover:text-[#FF8F3F] transition-colors duration-200">
+                create a new account
+              </Link>
+            </p>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-gray-300"></div>
           </div>
         </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-6 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
           {error && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
               <div className="flex">
@@ -148,26 +153,6 @@ export default function Login() {
               </button>
             </div>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Don&apos;t have an account?</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                href="/register"
-                className="w-full flex justify-center py-3 px-4 border-2 border-[#FF6B00] rounded-xl shadow-sm text-sm font-medium text-[#FF6B00] bg-white hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200"
-              >
-                Create an account
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </div>

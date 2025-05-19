@@ -46,23 +46,23 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col justify-center px-4 sm:px-6 lg:px-8 overflow-y-auto">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Image 
             src="/Fiire_logo.jpeg" 
             alt="Fiire Logo" 
-            width={120}
-            height={120}
+            width={80}
+            height={80}
             className="object-contain"
             priority
           />
         </div>
-        <div className="mt-6 text-center">
-          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
+        <div className="mt-2 text-center">
+          <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
             Create Account
           </h2>
-          <div className="mt-2 flex items-center justify-center space-x-2">
+          <div className="mt-1 flex items-center justify-center space-x-2">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-gray-300"></div>
             <p className="text-sm text-gray-500">
               Or{' '}
@@ -75,10 +75,10 @@ export default function Register() {
         </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
+      <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-4 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100">
           {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+            <div className="mb-2 bg-red-50 border-l-4 border-red-400 p-2 rounded-lg">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <FiAlertCircle className="h-5 w-5 text-red-400" />
@@ -90,7 +90,7 @@ export default function Register() {
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-3" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
@@ -106,7 +106,7 @@ export default function Register() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="John Doe"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function Register() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="you@example.com"
                 />
               </div>
@@ -150,7 +150,7 @@ export default function Register() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="••••••••"
                 />
               </div>
@@ -171,7 +171,7 @@ export default function Register() {
                   required
                   value={formData.startupName}
                   onChange={(e) => setFormData({ ...formData, startupName: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="Your Startup Name"
                 />
               </div>
@@ -187,7 +187,7 @@ export default function Register() {
                 required
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="mt-1 block w-full pl-3 pr-10 py-3 text-base border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm rounded-xl bg-white text-gray-900 transition-colors duration-200"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm rounded-xl bg-white text-gray-900 transition-colors duration-200"
               >
                 <option value="incubated">Incubated Startup</option>
                 <option value="external">External User</option>
@@ -198,7 +198,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] hover:from-[#FF8F3F] hover:to-[#FF6B00] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 ${
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] hover:from-[#FF8F3F] hover:to-[#FF6B00] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 ${
                   loading ? 'opacity-75 cursor-not-allowed' : ''
                 }`}
               >

@@ -73,11 +73,9 @@ export async function POST(req) {
         throw new Error('Failed to update user with reset token')
       }
 
-      // Get the origin from the request headers
-      const origin = req.headers.get('origin') || 'http://localhost:3000'
-      
-      // Create reset URL using the origin
-      const resetUrl = `${origin}/reset-password/${token}`
+      // Use NEXT_PUBLIC_BASE_URL for the reset URL
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const resetUrl = `${baseUrl}/reset-password/${token}`
 
       console.log('Sending reset email to:', email)
       console.log('Reset URL:', resetUrl)

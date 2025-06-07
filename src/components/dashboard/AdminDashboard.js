@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   })
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [userTypeTab, setUserTypeTab] = useState('incubated');
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     // Get URL parameters
@@ -63,6 +64,12 @@ export default function AdminDashboard() {
     fetchBookings()
     fetchAllUsers()
   }, [])
+
+  useEffect(() => {
+    // Update pending count whenever bookings change
+    const count = bookings.filter(b => b.status === 'pending').length;
+    setPendingCount(count);
+  }, [bookings]);
 
   const fetchRooms = async () => {
     try {
@@ -448,12 +455,12 @@ export default function AdminDashboard() {
               >
                 <FiCalendar className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Bookings</span>
-                {bookings.filter(b => b.status === 'pending').length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF6B00] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 sm:h-4 sm:w-4 bg-[#FF8F3F] items-center justify-center">
-                      <span className="text-[8px] sm:text-[10px] font-bold text-white">
-                        {bookings.filter(b => b.status === 'pending').length}
+                {pendingCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#FF6B00] opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-[#FF8F3F] items-center justify-center">
+                      <span className="text-[10px] sm:text-xs font-bold text-white">
+                        {pendingCount}
                       </span>
                     </span>
                   </span>
@@ -475,28 +482,28 @@ export default function AdminDashboard() {
         </div>
 
         {activeTab === 'rooms' && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <div className="flex justify-between items-center mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-100">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Meeting Rooms</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Meeting Rooms</h2>
                 <p className="mt-1 text-sm text-gray-500">Manage and monitor your meeting spaces</p>
               </div>
               <button
                 onClick={() => setIsAddRoomModalOpen(true)}
-                className="group flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg"
+                className="w-full sm:w-auto group flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <FiPlus className="w-5 h-5" />
                 <span className="font-medium">Add Room</span>
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {rooms.map((room) => (
                 <div
                   key={room._id}
                   className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300"
                 >
                   {room.images && room.images.length > 0 ? (
-                    <div className="relative h-56 overflow-hidden">
+                    <div className="relative h-48 sm:h-56 overflow-hidden">
                       <img
                         src={room.images[activeImageIndices[room._id] || 0]}
                         alt={`${room.name} - Room Image ${(activeImageIndices[room._id] || 0) + 1}`}
@@ -530,50 +537,50 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   ) : (
-                    <div className="h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <div className="h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                       <FiImage className="w-16 h-16 text-gray-400" />
                     </div>
                   )}
-                  <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">{room.name}</h3>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{room.name}</h3>
                         <div className="flex items-center text-gray-500">
                           <FiUsers className="w-4 h-4 mr-2" />
                           <span className="text-sm">Capacity: {room.capacity} people</span>
                         </div>
                       </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          setSelectedRoom(room)
-                          setIsEditRoomModalOpen(true)
-                        }}
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedRoom(room)
+                            setIsEditRoomModalOpen(true)
+                          }}
                           className="p-2 text-[#FF6B00] hover:bg-[#FFF5EB] rounded-lg transition-colors duration-200"
-                      >
-                        <FiEdit2 className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteRoom(room._id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                      >
-                        <FiTrash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                    <p className="text-gray-600 mb-4 line-clamp-2">{room.description}</p>
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-gray-900">Amenities</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {room.amenities.map((amenity, index) => (
-                        <span
-                          key={index}
-                            className="px-3 py-1.5 bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] text-[#FF6B00] rounded-lg text-sm font-medium flex items-center shadow-sm hover:shadow-md transition-all duration-200 border border-[#FFE4CC]/50 hover:border-[#FF6B00]/20"
                         >
-                            <FiCheck className="w-4 h-4 mr-1.5 text-[#FF8F3F]" />
-                          {amenity}
-                        </span>
-                      ))}
+                          <FiEdit2 className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRoom(room._id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                        >
+                          <FiTrash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4 line-clamp-2 text-sm sm:text-base">{room.description}</p>
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-gray-900 text-sm sm:text-base">Amenities</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {room.amenities.map((amenity, index) => (
+                          <span
+                            key={index}
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] text-[#FF6B00] rounded-lg text-xs sm:text-sm font-medium flex items-center shadow-sm hover:shadow-md transition-all duration-200 border border-[#FFE4CC]/50 hover:border-[#FF6B00]/20"
+                          >
+                            <FiCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 text-[#FF8F3F]" />
+                            {amenity}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -633,13 +640,7 @@ export default function AdminDashboard() {
                       <span className="w-2 h-2 bg-[#FF6B00] rounded-full"></span>
                       <span>Pending</span>
                       <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#FFE4CC] text-[#FF6B00] rounded-full">
-                        {bookings.filter(b => {
-                          const bookingDate = new Date(b.date);
-                          const [year, month] = selectedBookingMonth.split('-').map(Number);
-                          return b.status === 'pending' && 
-                                 bookingDate.getFullYear() === year && 
-                                 bookingDate.getMonth() === month - 1;
-                        }).length}
+                        {pendingCount}
                       </span>
                     </button>
                     <button
@@ -715,6 +716,12 @@ export default function AdminDashboard() {
                       const isInSelectedMonth = bookingDate.getFullYear() === year && 
                                              bookingDate.getMonth() === month - 1;
                       
+                      // Always show pending requests regardless of month
+                      if (bookingTab === 'pending') {
+                        return booking.status === 'pending';
+                      }
+                      
+                      // For other statuses, check if booking is in selected month
                       if (!isInSelectedMonth) return false;
                       
                       if (bookingTab === 'completed') {
@@ -744,6 +751,12 @@ export default function AdminDashboard() {
                     const isInSelectedMonth = bookingDate.getFullYear() === year && 
                                            bookingDate.getMonth() === month - 1;
                     
+                    // Always show pending requests regardless of month
+                    if (bookingTab === 'pending') {
+                      return booking.status === 'pending';
+                    }
+                    
+                    // For other statuses, check if booking is in selected month
                     if (!isInSelectedMonth) return false;
                     
                     if (bookingTab === 'completed') {
@@ -771,19 +784,19 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'analytics' && (
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl p-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-xl p-4 sm:p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 space-y-4 md:space-y-0">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h2>
-                <p className="text-gray-600">Comprehensive insights into your meeting room usage</p>
+                <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h2>
+                <p className="text-sm sm:text-base text-gray-600">Comprehensive insights into your meeting room usage</p>
               </div>
-              <div className="flex items-center space-x-4 bg-white p-2 rounded-xl shadow-sm">
+              <div className="w-full sm:w-auto flex items-center space-x-4 bg-white p-2 rounded-xl shadow-sm">
                 <label htmlFor="month-select" className="text-sm font-medium text-gray-700">Select Month:</label>
                 <select
                   id="month-select"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white text-gray-900 shadow-sm"
+                  className="block w-full sm:w-48 pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg bg-white text-gray-900 shadow-sm"
                 >
                   {getMonthOptions().map(option => (
                     <option key={option.value} value={option.value} className="text-gray-900">
@@ -795,58 +808,58 @@ export default function AdminDashboard() {
             </div>
             
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-white rounded-2xl p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#FFE4CC]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
+              <div className="bg-white rounded-2xl p-4 sm:p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#FFE4CC]">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[#FF6B00] text-sm font-medium mb-2">Total Bookings</p>
-                    <h3 className="text-4xl font-bold">{analyticsData.totalBookings}</h3>
-                    <p className="text-gray-500 text-sm mt-2">{analyticsData.selectedMonth}</p>
+                    <h3 className="text-2xl sm:text-4xl font-bold">{analyticsData.totalBookings}</h3>
+                    <p className="text-gray-500 text-xs sm:text-sm mt-2">{analyticsData.selectedMonth}</p>
                   </div>
-                  <div className="bg-[#FFF5EB] p-4 rounded-xl">
-                    <FiCalendar className="w-8 h-8 text-[#FF6B00]" />
+                  <div className="bg-[#FFF5EB] p-3 sm:p-4 rounded-xl">
+                    <FiCalendar className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6B00]" />
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#E6F4EA]">
+              <div className="bg-white rounded-2xl p-4 sm:p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#E6F4EA]">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[#1E7E34] text-sm font-medium mb-2">Total Hours Booked</p>
-                    <h3 className="text-4xl font-bold">{analyticsData.totalHours.toFixed(1)}</h3>
-                    <p className="text-gray-500 text-sm mt-2">{analyticsData.selectedMonth}</p>
+                    <h3 className="text-2xl sm:text-4xl font-bold">{analyticsData.totalHours.toFixed(1)}</h3>
+                    <p className="text-gray-500 text-xs sm:text-sm mt-2">{analyticsData.selectedMonth}</p>
                   </div>
-                  <div className="bg-[#E6F4EA] p-4 rounded-xl">
-                    <FiClock className="w-8 h-8 text-[#1E7E34]" />
+                  <div className="bg-[#E6F4EA] p-3 sm:p-4 rounded-xl">
+                    <FiClock className="w-6 h-6 sm:w-8 sm:h-8 text-[#1E7E34]" />
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#FFE4CC]">
+              <div className="bg-white rounded-2xl p-4 sm:p-8 text-gray-900 transform hover:scale-105 transition-transform duration-300 shadow-lg border border-[#FFE4CC]">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[#FF6B00] text-sm font-medium mb-2">Active Users</p>
-                    <h3 className="text-4xl font-bold">{analyticsData.userStats.length}</h3>
-                    <p className="text-gray-500 text-sm mt-2">{analyticsData.selectedMonth}</p>
+                    <h3 className="text-2xl sm:text-4xl font-bold">{analyticsData.userStats.length}</h3>
+                    <p className="text-gray-500 text-xs sm:text-sm mt-2">{analyticsData.selectedMonth}</p>
                   </div>
-                  <div className="bg-[#FFF5EB] p-4 rounded-xl">
-                    <FiUsers className="w-8 h-8 text-[#FF6B00]" />
+                  <div className="bg-[#FFF5EB] p-3 sm:p-4 rounded-xl">
+                    <FiUsers className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6B00]" />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* User Statistics */}
-            <div className="mb-12">
+            <div className="mb-8 sm:mb-12">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">User Statistics</h3>
-                  <p className="text-gray-600 mt-1">Detailed breakdown of user booking patterns</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">User Statistics</h3>
+                  <p className="text-sm sm:text-base text-gray-600 mt-1">Detailed breakdown of user booking patterns</p>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className="bg-white p-1 rounded-xl shadow-sm">
+                <div className="w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                  <div className="w-full sm:w-auto bg-white p-1 rounded-xl shadow-sm">
                     <div className="flex space-x-1">
                       <button
                         onClick={() => setUserTypeTab('incubated')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                           userTypeTab === 'incubated'
                             ? 'bg-indigo-600 text-white'
                             : 'text-gray-600 hover:bg-gray-100'
@@ -856,7 +869,7 @@ export default function AdminDashboard() {
                       </button>
                       <button
                         onClick={() => setUserTypeTab('external')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`w-full sm:w-auto px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                           userTypeTab === 'external'
                             ? 'bg-indigo-600 text-white'
                             : 'text-gray-600 hover:bg-gray-100'
@@ -866,7 +879,7 @@ export default function AdminDashboard() {
                       </button>
                     </div>
                   </div>
-                  <div className="bg-indigo-50 px-4 py-2 rounded-lg">
+                  <div className="w-full sm:w-auto bg-indigo-50 px-4 py-2 rounded-lg">
                     <p className="text-indigo-700 text-sm font-medium">
                       Total {userTypeTab === 'incubated' ? 'Incubated' : 'External'} Users: {
                         analyticsData.userStats.filter(user => 
@@ -878,12 +891,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                 {/* User List Section - 5 columns */}
                 <div className="lg:col-span-5 bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
                   <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-lg font-semibold text-gray-900">User Directory</h4>
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900">User Directory</h4>
                       <div className="bg-white px-3 py-1 rounded-lg shadow-sm">
                         <p className="text-sm font-medium text-indigo-600">
                           {analyticsData.userStats.filter(user => 
@@ -893,7 +906,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
+                  <div className="max-h-[400px] sm:max-h-[600px] overflow-y-auto custom-scrollbar">
                     <div className="divide-y divide-gray-200">
                       {analyticsData.userStats
                         .filter(user => userTypeTab === 'incubated' ? user.role === 'incubated' : user.role === 'external')
@@ -906,13 +919,13 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between">
                                   <div>
                                     <h5 className="text-sm font-semibold text-gray-900">{user.name}</h5>
                                     <p className="text-xs text-gray-500">{user.email}</p>
                                   </div>
                                   {user.startupName && user.startupName !== '-' && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                    <span className="mt-2 sm:mt-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                                       {user.startupName}
                                     </span>
                                   )}
@@ -936,7 +949,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Statistics Section - 7 columns */}
-                <div className="lg:col-span-7 space-y-6">
+                <div className="lg:col-span-7 space-y-4 sm:space-y-6">
                   {/* Overall Statistics Card */}
                   <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-lg">
                     <div className="flex items-center justify-between mb-4">
@@ -945,7 +958,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-gray-500 mt-1">{analyticsData.selectedMonth}</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4">
                         <div className="flex items-center space-x-3">
                           <div className="bg-indigo-100 p-2 rounded-lg">
@@ -953,7 +966,7 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <p className="text-xs font-medium text-gray-600">Total Bookings</p>
-                            <p className="text-xl font-bold text-gray-900 mt-1">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
                               {analyticsData.userStats
                                 .filter(user => userTypeTab === 'incubated' ? user.role === 'incubated' : user.role === 'external')
                                 .reduce((sum, user) => sum + user.totalBookings, 0)}
@@ -968,7 +981,7 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <p className="text-xs font-medium text-gray-600">Total Hours</p>
-                            <p className="text-xl font-bold text-gray-900 mt-1">
+                            <p className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
                               {analyticsData.userStats
                                 .filter(user => userTypeTab === 'incubated' ? user.role === 'incubated' : user.role === 'external')
                                 .reduce((sum, user) => sum + user.totalHours, 0).toFixed(1)}
@@ -981,9 +994,9 @@ export default function AdminDashboard() {
 
                   {/* Status Breakdown Card */}
                   <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-2 sm:space-y-0">
                       <h4 className="text-base font-semibold text-gray-900">Status Breakdown</h4>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center">
                           <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1"></div>
                           <span className="text-xs text-gray-600">Pending</span>
@@ -1095,7 +1108,7 @@ export default function AdminDashboard() {
                                 <div key={idx} className="bg-gray-50 p-2 rounded-lg">
                                   <div className="flex items-center justify-between mb-1">
                                     <span className="text-xs font-medium text-gray-900">{booking.room?.name}</span>
-                                    <span className={`px-1.5 py-0.5 text-xs font-semibold rounded-full ${
+                                    <span className={`mt-1 sm:mt-0 px-1.5 py-0.5 text-xs font-semibold rounded-full ${
                                       booking.status === 'approved' ? 'bg-green-100 text-green-800' :
                                       booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                       'bg-red-100 text-red-800'
@@ -1173,9 +1186,7 @@ const BookingCard = ({ booking, onApprove, onReject }) => {
                 <FiCalendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900">
-                  {booking.room?.name}
-                </h3>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">{booking.room?.name}</h3>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${
                     isCompleted

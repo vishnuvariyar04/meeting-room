@@ -411,74 +411,67 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-white to-gray-50 rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-100">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
-              <div className="flex items-center gap-3 sm:gap-4">
+        <div className="bg-gradient-to-r from-white to-gray-50 rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-6 mb-4 sm:mb-8 border border-gray-100">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <div className="relative">
                   <Image 
                     src="/Fiire_logo.jpeg" 
                     alt="Fiire Logo" 
-                    width={44}
-                    height={44}
-                    className="object-contain sm:w-14 sm:h-14 rounded-xl shadow-sm"
+                    width={36}
+                    height={36}
+                    className="object-contain sm:w-14 sm:h-14 rounded-lg sm:rounded-xl shadow-sm"
                     priority
                   />
-                  <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-gray-200/50"></div>
+                  <div className="absolute inset-0 rounded-lg sm:rounded-xl ring-1 ring-inset ring-gray-200/50"></div>
                 </div>
-                <div className="h-10 sm:h-12 w-px bg-gradient-to-b from-gray-200 to-gray-100"></div>
+                <div className="h-8 sm:h-12 w-px bg-gradient-to-b from-gray-200 to-gray-100"></div>
               </div>
               <div className="flex-1 sm:flex-none">
                 <div className="flex items-center justify-between sm:block">
-                  <h1 className="text-lg sm:text-xl font-bold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">
+                  <h1 className="text-base sm:text-xl font-bold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">
                     User Dashboard
                   </h1>
-                  <button
-                    onClick={() => signOut()}
-                    className="sm:hidden group flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow text-xs"
-                  >
-                    <span className="font-medium text-gray-700 group-hover:text-[#FF6B00] transition-colors">Sign out</span>
-                    <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#FF6B00] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                  </button>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
                   <p className="text-xs sm:text-sm text-gray-600">
                     Welcome back, <span className="font-semibold text-[#FF6B00]">{session?.user?.name}</span>
                   </p>
-                  <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-full shadow-sm">
+                  <span className="px-1.5 sm:px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-full shadow-sm">
                     {session?.user?.role === 'incubated' ? 'Incubated User' : 'External User'}
                   </span>
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => signOut()}
-              className="hidden sm:flex group items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-200 rounded-lg hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow text-xs sm:text-sm"
-            >
-              <span className="font-medium text-gray-700 group-hover:text-[#FF6B00] transition-colors">Sign out</span>
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover:text-[#FF6B00] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
+            <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
+              <button
+                onClick={() => signOut()}
+                className="w-full sm:w-auto group flex items-center justify-center gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white border border-gray-200 rounded-lg hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow text-xs sm:text-sm"
+              >
+                <span className="font-medium text-gray-700 group-hover:text-[#FF6B00] transition-colors">Sign out</span>
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 group-hover:text-[#FF6B00] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="mb-6">
-          <div className="bg-white rounded-2xl shadow-lg p-2 border border-gray-100">
-            <nav className="flex space-x-2">
+        <div className="mb-4 sm:mb-6">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-1.5 sm:p-2 border border-gray-100">
+            <nav className="flex space-x-1 sm:space-x-2">
               <button
                 onClick={() => setActiveTab('book')}
                 className={`${
                   activeTab === 'book'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2`}
+                } px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2`}
               >
-                <FiCalendar className="w-4 h-4" />
+                <FiCalendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>Book a Room</span>
               </button>
               <button
@@ -487,9 +480,9 @@ export default function UserDashboard() {
                   activeTab === 'bookings'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2`}
+                } px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2`}
               >
-                <FiList className="w-4 h-4" />
+                <FiList className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>My Bookings</span>
               </button>
               <button
@@ -498,9 +491,9 @@ export default function UserDashboard() {
                   activeTab === 'rooms'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2`}
+                } px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2`}
               >
-                <FiImage className="w-4 h-4" />
+                <FiImage className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>All Rooms</span>
               </button>
             </nav>
@@ -508,16 +501,16 @@ export default function UserDashboard() {
         </div>
 
         {activeTab === 'book' && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-100">
             <div className="relative overflow-hidden">
               {/* Calendar and Time Selection Section */}
               <div className={`transition-all duration-500 ease-in-out ${
                 showAvailableRooms ? 'opacity-0 -translate-x-full absolute inset-0' : 'opacity-100 translate-x-0'
               }`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Select Date</h2>
-                    <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Select Date</h2>
+                    <div className="bg-white rounded-lg shadow p-2 sm:p-4 border border-gray-200">
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateCalendar
                           value={selectedDate}
@@ -526,22 +519,22 @@ export default function UserDashboard() {
                           sx={{
                             width: '100%',
                             '.MuiPickersCalendarHeader-root': {
-                              marginBottom: '16px',
-                              padding: '0 8px'
+                              marginBottom: '12px',
+                              padding: '0 4px'
                             },
                             '.MuiPickersCalendarHeader-label': {
                               color: '#111827',
                               fontWeight: 600,
-                              fontSize: '1.1rem'
+                              fontSize: '1rem'
                             },
                             '.MuiPickersDay-root': {
                               color: '#374151',
                               fontSize: '0.875rem',
                               fontWeight: 500,
-                              margin: '2px',
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
+                              margin: '1px',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '6px',
                               '&:hover': {
                                 backgroundColor: '#FFF5EB',
                                 color: '#FF6B00'
@@ -565,10 +558,10 @@ export default function UserDashboard() {
                               }
                             },
                             '.MuiPickersCalendarHeader-switchHeader': {
-                              marginTop: '8px'
+                              marginTop: '4px'
                             },
                             '.MuiPickersArrowSwitcher-root': {
-                              margin: '0 8px'
+                              margin: '0 4px'
                             },
                             '.MuiPickersArrowSwitcher-button': {
                               color: '#FF6B00',
@@ -577,8 +570,8 @@ export default function UserDashboard() {
                               }
                             },
                             '.MuiPickersCalendarHeader-labelContainer': {
-                              marginLeft: '4px',
-                              marginRight: '4px'
+                              marginLeft: '2px',
+                              marginRight: '2px'
                             }
                           }}
                         />
@@ -587,20 +580,20 @@ export default function UserDashboard() {
                   </div>
 
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Select Time Slots</h2>
-                    <div className="grid grid-cols-3 gap-3 mb-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Select Time Slots</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
                       {generateTimeSlots().map((slot, index) => (
                         <button
                           key={index}
                           onClick={() => handleTimeSlotSelect(slot)}
-                          className={`p-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          className={`p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${
                             isSlotInRange(slot)
                               ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white shadow-md'
                               : 'bg-white text-gray-700 hover:bg-[#FFF5EB] hover:text-[#FF6B00] border border-gray-200 hover:border-[#FFE4CC] shadow-sm hover:shadow'
                           }`}
                         >
                           <div className="flex items-center justify-center space-x-1">
-                            <FiClock className={`w-4 h-4 ${
+                            <FiClock className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                               isSlotInRange(slot) ? 'text-white' : 'text-[#FF6B00]'
                             }`} />
                             <span>{slot.startTime} - {slot.endTime}</span>
@@ -609,14 +602,14 @@ export default function UserDashboard() {
                       ))}
                     </div>
                     {selectedTimeSlots.length > 0 && (
-                      <div className="space-y-4">
-                        <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-4 rounded-xl border border-[#FFE4CC]/50">
-                          <h3 className="text-sm font-medium text-[#FF6B00] mb-2 flex items-center">
-                            <FiClock className="w-4 h-4 mr-2" />
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-3 sm:p-4 rounded-lg sm:rounded-xl border border-[#FFE4CC]/50">
+                          <h3 className="text-xs sm:text-sm font-medium text-[#FF6B00] mb-2 flex items-center">
+                            <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                             Selected Time Slots
                           </h3>
                           <div className="flex flex-wrap gap-2">
-                            <span className="px-4 py-2 bg-white text-[#FF6B00] rounded-lg text-sm font-medium shadow-sm border border-[#FFE4CC]">
+                            <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-[#FF6B00] rounded-lg text-xs sm:text-sm font-medium shadow-sm border border-[#FFE4CC]">
                               {sortedSelected[0]?.startTime} - {sortedSelected[sortedSelected.length - 1]?.endTime}
                             </span>
                           </div>
@@ -626,9 +619,9 @@ export default function UserDashboard() {
                             fetchAvailableRooms()
                             setShowAvailableRooms(true)
                           }}
-                          className="w-full py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2"
+                          className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-lg sm:rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2 text-sm sm:text-base"
                         >
-                          <FiCheck className="w-5 h-5" />
+                          <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                           <span>Show Available Rooms</span>
                         </button>
                       </div>
@@ -1230,7 +1223,7 @@ export default function UserDashboard() {
               <div className={`transition-all duration-500 ease-in-out ${
                 showRoomDetails ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full absolute inset-0'
               }`}>
-                <div className="flex items-center mb-6">
+                <div className="flex items-center mb-4 sm:mb-6">
                   <button
                     onClick={() => {
                       setSelectedRoom(null)
@@ -1238,28 +1231,28 @@ export default function UserDashboard() {
                       setRoomPurpose('')
                       setShowRoomDetails(false)
                     }}
-                    className="mr-4 p-2 text-gray-600 hover:text-gray-900"
+                    className="mr-3 sm:mr-4 p-1.5 sm:p-2 text-gray-600 hover:text-[#FF6B00] transition-colors"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-800">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
                       Book: {selectedRoom?.name}
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
                       Select a date and time to book this room
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Date</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Date</h3>
                     {selectedRoom?.images && selectedRoom.images.length > 0 && (
                       <div className="mb-4">
-                        <div className="relative h-64 rounded-lg overflow-hidden group">
+                        <div className="relative h-48 sm:h-64 rounded-lg sm:rounded-xl overflow-hidden group">
                           <img
                             src={selectedRoom.images[activeImageIndices[selectedRoom._id] || 0]}
                             alt={`${selectedRoom.name} - Room Image ${(activeImageIndices[selectedRoom._id] || 0) + 1}`}
@@ -1269,21 +1262,21 @@ export default function UserDashboard() {
                             <>
                               <button
                                 onClick={(e) => handlePrevImage(selectedRoom._id, e)}
-                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
                               >
-                                <FiChevronLeft className="w-6 h-6" />
+                                <FiChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
                               </button>
                               <button
                                 onClick={(e) => handleNextImage(selectedRoom._id, e)}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
                               >
-                                <FiChevronRight className="w-6 h-6" />
+                                <FiChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
                               </button>
-                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1.5 sm:space-x-2">
                                 {selectedRoom.images.map((_, index) => (
                                   <div
                                     key={index}
-                                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors duration-200 ${
                                       (activeImageIndices[selectedRoom._id] || 0) === index ? 'bg-white' : 'bg-white/50'
                                     }`}
                                   />
@@ -1294,7 +1287,7 @@ export default function UserDashboard() {
                         </div>
                       </div>
                     )}
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+                    <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-6 border border-gray-100">
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateCalendar
                           value={roomDate}
@@ -1303,22 +1296,22 @@ export default function UserDashboard() {
                           sx={{
                             width: '100%',
                             '.MuiPickersCalendarHeader-root': {
-                              marginBottom: '16px',
-                              padding: '0 8px'
+                              marginBottom: '12px',
+                              padding: '0 4px'
                             },
                             '.MuiPickersCalendarHeader-label': {
                               color: '#111827',
                               fontWeight: 600,
-                              fontSize: '1.1rem'
+                              fontSize: '1rem'
                             },
                             '.MuiPickersDay-root': {
                               color: '#374151',
                               fontSize: '0.875rem',
                               fontWeight: 500,
-                              margin: '2px',
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
+                              margin: '1px',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '6px',
                               '&:hover': {
                                 backgroundColor: '#FFF5EB',
                                 color: '#FF6B00'
@@ -1342,10 +1335,10 @@ export default function UserDashboard() {
                               }
                             },
                             '.MuiPickersCalendarHeader-switchHeader': {
-                              marginTop: '8px'
+                              marginTop: '4px'
                             },
                             '.MuiPickersArrowSwitcher-root': {
-                              margin: '0 8px'
+                              margin: '0 4px'
                             },
                             '.MuiPickersArrowSwitcher-button': {
                               color: '#FF6B00',
@@ -1354,8 +1347,8 @@ export default function UserDashboard() {
                               }
                             },
                             '.MuiPickersCalendarHeader-labelContainer': {
-                              marginLeft: '4px',
-                              marginRight: '4px'
+                              marginLeft: '2px',
+                              marginRight: '2px'
                             }
                           }}
                         />
@@ -1364,21 +1357,21 @@ export default function UserDashboard() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Available Time Slots</h3>
-                    <div className="grid grid-cols-3 gap-3 mb-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Available Time Slots</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
                       {roomAvailableSlots.length === 0 && (
-                        <div className="col-span-3 text-center py-8 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100">
-                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFF5EB] mb-3">
-                            <FiClock className="w-6 h-6 text-[#FF6B00]" />
+                        <div className="col-span-2 sm:col-span-3 text-center py-6 sm:py-8 bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-100">
+                          <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFF5EB] mb-3">
+                            <FiClock className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF6B00]" />
                           </div>
-                          <p className="text-gray-500">No available slots for this date.</p>
+                          <p className="text-sm sm:text-base text-gray-500">No available slots for this date.</p>
                         </div>
                       )}
                       {roomAvailableSlots.map((slot, idx) => (
                         <button
                           key={idx}
                           onClick={() => slot.isAvailable && handleRoomSlotSelect(slot)}
-                          className={`p-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          className={`p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${
                             !slot.isAvailable
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                               : roomSelectedSlots.some(
@@ -1390,7 +1383,7 @@ export default function UserDashboard() {
                           disabled={!slot.isAvailable}
                         >
                           <div className="flex items-center justify-center space-x-1">
-                            <FiClock className={`w-4 h-4 ${
+                            <FiClock className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                               roomSelectedSlots.some(
                                 s => s.startTime === slot.startTime && s.endTime === slot.endTime
                               ) ? 'text-white' : 'text-[#FF6B00]'
@@ -1404,20 +1397,20 @@ export default function UserDashboard() {
                       ))}
                     </div>
                     {roomSelectedSlots.length > 0 && (
-                      <div className="space-y-4">
-                        <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-4 rounded-xl border border-[#FFE4CC]/50">
-                          <h3 className="text-sm font-medium text-[#FF6B00] mb-2 flex items-center">
-                            <FiClock className="w-4 h-4 mr-2" />
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-3 sm:p-4 rounded-lg sm:rounded-xl border border-[#FFE4CC]/50">
+                          <h3 className="text-xs sm:text-sm font-medium text-[#FF6B00] mb-2 flex items-center">
+                            <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                             Selected Time Slots
                           </h3>
                           <div className="flex flex-wrap gap-2">
-                            <span className="px-4 py-2 bg-white text-[#FF6B00] rounded-lg text-sm font-medium shadow-sm border border-[#FFE4CC]">
+                            <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-[#FF6B00] rounded-lg text-xs sm:text-sm font-medium shadow-sm border border-[#FFE4CC]">
                               {roomSelectedSlots[0]?.startTime} - {roomSelectedSlots[roomSelectedSlots.length - 1]?.endTime}
                             </span>
                           </div>
                         </div>
                         <div className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="roomPurpose">
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" htmlFor="roomPurpose">
                             Meeting Purpose
                           </label>
                           <textarea
@@ -1426,14 +1419,14 @@ export default function UserDashboard() {
                             onChange={e => setRoomPurpose(e.target.value)}
                             placeholder="Describe your meeting purpose..."
                             rows={3}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white text-gray-900 placeholder-gray-500 transition resize-none"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-[#FFE4CC] bg-white text-gray-900 placeholder-gray-500 transition resize-none text-xs sm:text-sm"
                           />
                         </div>
                         <button
                           onClick={handleBookSelectedRoom}
-                          className="w-full py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2"
+                          className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-lg sm:rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2 text-sm sm:text-base"
                         >
-                          <FiCheck className="w-5 h-5" />
+                          <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                           <span>Book Selected Slot(s)</span>
                         </button>
                       </div>

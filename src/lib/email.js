@@ -3,6 +3,14 @@ import sgMail from '@sendgrid/mail'
 // Initialize SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
+// Function to get base URL
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+}
+
 export async function sendEmail({ to, subject, html }) {
   try {
     const msg = {
@@ -79,11 +87,11 @@ const emailTemplates = {
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-          <a href="${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings/approve/${bookingDetails.bookingId}" 
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/bookings/approve/${bookingDetails.bookingId}" 
              style="display: inline-block; background-color: #48bb78; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-right: 10px;">
             Approve
           </a>
-          <a href="${process.env.NEXT_PUBLIC_BASE_URL}/api/bookings/reject/${bookingDetails.bookingId}" 
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/bookings/reject/${bookingDetails.bookingId}" 
              style="display: inline-block; background-color: #f56565; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
             Reject
           </a>

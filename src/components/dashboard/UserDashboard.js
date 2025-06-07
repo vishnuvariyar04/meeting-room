@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
-import { FiCalendar, FiClock, FiUsers, FiInfo, FiCheck, FiImage, FiChevronLeft, FiChevronRight, FiHome, FiList, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi'
+import { FiCalendar, FiClock, FiUsers, FiInfo, FiCheck, FiImage, FiChevronLeft, FiChevronRight, FiHome, FiList } from 'react-icons/fi'
 import * as React from 'react'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -46,15 +46,6 @@ export default function UserDashboard() {
   const [activeImageIndices, setActiveImageIndices] = useState({})
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'))
   const [activeBookingStatus, setActiveBookingStatus] = useState('All')
-  const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false)
-  const [isEditRoomModalOpen, setIsEditRoomModalOpen] = useState(false)
-  const [analyticsData, setAnalyticsData] = useState({
-    totalBookings: 0,
-    totalHours: 0,
-    userStats: [],
-    selectedMonth: dayjs().format('MMMM YYYY'),
-  })
-  const [userTypeTab, setUserTypeTab] = useState('incubated')
 
   useEffect(() => {
     fetchRooms()
@@ -419,32 +410,6 @@ export default function UserDashboard() {
     });
   };
 
-  const getMonthOptions = () => {
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    return months.map((month, index) => ({
-      value: dayjs().year(dayjs().year()).month(index).format('YYYY-MM'),
-      label: month
-    }));
-  };
-
-  const handleDeleteRoom = async (roomId) => {
-    try {
-      const response = await fetch(`/api/rooms/${roomId}`, {
-        method: 'DELETE'
-      });
-      if (response.ok) {
-        fetchRooms();
-        alert('Room deleted successfully!');
-      } else {
-        console.error('Error deleting room:', response.statusText);
-        alert('Failed to delete room');
-      }
-    } catch (error) {
-      console.error('Error deleting room:', error);
-      alert('Failed to delete room');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -531,17 +496,6 @@ export default function UserDashboard() {
               >
                 <FiImage className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>All Rooms</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('analytics')}
-                className={`${
-                  activeTab === 'analytics'
-                    ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
-                    : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center space-x-1.5 sm:space-x-2`}
-              >
-                <FiInfo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Analytics</span>
               </button>
             </nav>
           </div>
@@ -1122,173 +1076,422 @@ export default function UserDashboard() {
         )}
 
         {activeTab === 'rooms' && (
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-8 border border-gray-100">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 space-y-3 sm:space-y-0">
-              <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Meeting Rooms</h2>
-                <p className="mt-1 text-xs sm:text-sm text-gray-500">Manage and monitor your meeting spaces</p>
-              </div>
-              <button
-                onClick={() => setIsAddRoomModalOpen(true)}
-                className="w-full sm:w-auto group flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-lg sm:rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="text-sm sm:text-base font-medium">Add Room</span>
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {rooms.map((room) => (
-                <div
-                  key={room._id}
-                  className="group bg-white border border-gray-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
-                >
-                  {room.images && room.images.length > 0 ? (
-                    <div className="relative h-48 sm:h-56 overflow-hidden">
-                      <img
-                        src={room.images[activeImageIndices[room._id] || 0]}
-                        alt={`${room.name} - Room Image ${(activeImageIndices[room._id] || 0) + 1}`}
-                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="relative overflow-hidden">
+              {/* Rooms List Section */}
+              <div className={`transition-all duration-500 ease-in-out ${
+                showRoomDetails ? 'opacity-0 -translate-x-full absolute inset-0' : 'opacity-100 translate-x-0'
+              }`}>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                  <h2 className="text-2xl font-semibold text-gray-800">All Rooms</h2>
+                  
+                  {/* Search Bar */}
+                  <div className="w-full sm:w-80 relative">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search rooms by name, description, or amenities..."
+                        value={roomFilters.searchQuery}
+                        onChange={(e) => setRoomFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
+                        className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors duration-200 shadow-sm hover:border-gray-300"
                       />
-                      {room.images.length > 1 && (
-                        <>
-                          <button
-                            onClick={(e) => handlePrevImage(room._id, e)}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                          >
-                            <FiChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
-                          <button
-                            onClick={(e) => handleNextImage(room._id, e)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                          >
-                            <FiChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
-                          <div className="absolute bottom-2 sm:bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1.5 sm:space-x-2">
-                            {room.images.map((_, index) => (
-                              <div
-                                key={index}
-                                className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors duration-200 ${
-                                  (activeImageIndices[room._id] || 0) === index ? 'bg-white' : 'bg-white/50'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </>
-                      )}
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="h-48 sm:h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                      <FiImage className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
-                    </div>
-                  )}
-                  <div className="p-3 sm:p-4 md:p-6">
-                    <div className="flex justify-between items-start mb-3 sm:mb-4">
-                      <div>
-                        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1">{room.name}</h3>
-                        <div className="flex items-center text-gray-500">
-                          <FiUsers className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                          <span className="text-xs sm:text-sm">Capacity: {room.capacity} people</span>
+                  </div>
+                </div>
+
+                {/* Filters Section */}
+                <div className="mb-6 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Capacity Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Minimum Capacity
+                      </label>
+                      <div className="relative">
+                      <select
+                        value={roomFilters.capacity}
+                        onChange={(e) => setRoomFilters(prev => ({ ...prev, capacity: e.target.value }))}
+                          className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-[#FFE4CC] transition-all duration-200 appearance-none cursor-pointer hover:border-[#FF6B00]/50"
+                          style={{
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'none'
+                          }}
+                        >
+                          <option value="" className="py-3 px-4 text-gray-500 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">Any Capacity</option>
+                          <option value="2" className="py-3 px-4 text-gray-700 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">2+ people</option>
+                          <option value="4" className="py-3 px-4 text-gray-700 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">4+ people</option>
+                          <option value="6" className="py-3 px-4 text-gray-700 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">6+ people</option>
+                          <option value="8" className="py-3 px-4 text-gray-700 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">8+ people</option>
+                          <option value="10" className="py-3 px-4 text-gray-700 bg-white hover:bg-[#FFF5EB] hover:text-[#FF6B00] focus:bg-[#FFF5EB] focus:text-[#FF6B00] selected:bg-[#FFF5EB] selected:text-[#FF6B00] [&:hover]:bg-[#FFF5EB] [&:hover]:text-[#FF6B00] [&:focus]:bg-[#FFF5EB] [&:focus]:text-[#FF6B00] [&:active]:bg-[#FFF5EB] [&:active]:text-[#FF6B00] [&:checked]:bg-[#FFF5EB] [&:checked]:text-[#FF6B00]">10+ people</option>
+                      </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                          <svg className="w-5 h-5 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
                         </div>
                       </div>
-                      <div className="flex space-x-1.5 sm:space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedRoom(room)
-                            setIsEditRoomModalOpen(true)
-                          }}
-                          className="p-1.5 sm:p-2 text-[#FF6B00] hover:bg-[#FFF5EB] rounded-lg transition-colors duration-200"
-                        >
-                          <FiEdit2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteRoom(room._id)}
-                          className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                        >
-                          <FiTrash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
-                      </div>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 line-clamp-2">{room.description}</p>
-                    <div className="space-y-2 sm:space-y-3">
-                      <h4 className="text-xs sm:text-sm font-medium text-gray-900">Amenities</h4>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {room.amenities.map((amenity, index) => (
-                          <span
-                            key={index}
-                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] text-[#FF6B00] rounded-lg text-xs sm:text-sm font-medium flex items-center shadow-sm hover:shadow-md transition-all duration-200 border border-[#FFE4CC]/50 hover:border-[#FF6B00]/20"
+
+                    {/* Amenities Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Amenities
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {['Projector', 'Whiteboard', 'TV', 'Video Conferencing', 'Coffee Machine'].map((amenity) => (
+                          <button
+                            key={amenity}
+                            onClick={() => {
+                              setRoomFilters(prev => ({
+                                ...prev,
+                                amenities: prev.amenities.includes(amenity)
+                                  ? prev.amenities.filter(a => a !== amenity)
+                                  : [...prev.amenities, amenity]
+                              }))
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              roomFilters.amenities.includes(amenity)
+                                ? 'bg-indigo-600 text-white shadow-sm'
+                                : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                            }`}
                           >
-                            <FiCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-[#FF8F3F]" />
                             {amenity}
-                          </span>
+                          </button>
                         ))}
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {activeTab === 'analytics' && (
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-8 space-y-3 sm:space-y-0">
-              <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Analytics Dashboard</h2>
-                <p className="text-xs sm:text-sm text-gray-600">Comprehensive insights into your meeting room usage</p>
-              </div>
-              <div className="w-full sm:w-auto flex items-center space-x-2 sm:space-x-4 bg-white p-2 rounded-lg sm:rounded-xl shadow-sm">
-                <label htmlFor="month-select" className="text-xs sm:text-sm font-medium text-gray-700">Select Month:</label>
-                <select
-                  id="month-select"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="block w-full sm:w-48 pl-2 sm:pl-3 pr-8 sm:pr-10 py-1.5 sm:py-2 text-xs sm:text-sm border-gray-300 focus:outline-none focus:ring-[#FF6B00] focus:border-[#FF6B00] rounded-lg bg-white text-gray-900 shadow-sm"
-                >
-                  {getMonthOptions().map(option => (
-                    <option key={option.value} value={option.value} className="text-gray-900">
-                      {option.label}
-                    </option>
+                    {/* Clear Filters Button */}
+                    <div className="flex items-end">
+                      <button
+                        onClick={() => setRoomFilters({
+                          capacity: '',
+                          amenities: [],
+                          searchQuery: ''
+                        })}
+                        className="w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm"
+                      >
+                        Clear All Filters
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rooms Grid */}
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {getFilteredRooms().map(room => (
+                    <div
+                      key={room._id}
+                      className={`group flex flex-col justify-between h-full bg-white border border-gray-200 rounded-2xl shadow-sm p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer ${
+                        selectedRoom && selectedRoom._id === room._id ? 'border-[#FF6B00] ring-2 ring-[#FFE4CC]' : ''
+                      }`}
+                      onClick={() => handleSelectRoom(room)}
+                    >
+                      {room.images && room.images.length > 0 ? (
+                        <div className="relative h-56 mb-6 rounded-xl overflow-hidden group">
+                          <img
+                            src={room.images[activeImageIndices[room._id] || 0]}
+                            alt={`${room.name} - Room Image ${(activeImageIndices[room._id] || 0) + 1}`}
+                            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                          />
+                          {room.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => handlePrevImage(room._id, e)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronLeft className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={(e) => handleNextImage(room._id, e)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <FiChevronRight className="w-5 h-5" />
+                              </button>
+                              <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                {room.images.map((_, index) => (
+                                  <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                                      (activeImageIndices[room._id] || 0) === index ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="h-56 mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center group-hover:from-gray-200 group-hover:to-gray-300 transition-all duration-300">
+                          <FiImage className="w-16 h-16 text-gray-400 group-hover:text-gray-500 transition-colors" />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#FF6B00] transition-colors">{room.name}</h3>
+                        <p className="text-gray-600 text-sm mb-4 italic border-l-4 border-[#FFE4CC] pl-3 group-hover:border-[#FF6B00] transition-colors">
+                          {room.description}
+                        </p>
+                        <div className="flex items-center text-gray-600 mb-4">
+                          <span className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-lg text-sm font-medium flex items-center shadow-sm border border-blue-100 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300">
+                            <FiUsers className="w-4 h-4 mr-1.5 text-blue-500" />
+                            {room.capacity} people
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {room.amenities.map((amenity, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1.5 bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] text-[#FF6B00] rounded-lg text-sm font-medium flex items-center shadow-sm hover:shadow-md transition-all duration-200 border border-[#FFE4CC]/50 hover:border-[#FF6B00]/20"
+                            >
+                              <FiCheck className="w-4 h-4 mr-1.5 text-[#FF8F3F]" />
+                              {amenity}
+                            </span>
+                          ))}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectRoom(room);
+                          }}
+                          className="w-full py-2.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2"
+                        >
+                          <FiCalendar className="w-4 h-4" />
+                          <span>Book This Room</span>
+                        </button>
+                      </div>
+                    </div>
                   ))}
-                </select>
-              </div>
-            </div>
-            
-            {/* Overview Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-12">
-              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 text-gray-900 transform hover:scale-[1.02] transition-transform duration-300 shadow-md border border-[#FFE4CC]">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-[#FF6B00] mb-1 sm:mb-2">Total Bookings</p>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">{analyticsData.totalBookings}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">{analyticsData.selectedMonth}</p>
+                </div>
+
+                {/* No Results Message */}
+                {getFilteredRooms().length === 0 && (
+                  <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#FFF5EB] mb-6">
+                      <FiInfo className="w-10 h-10 text-[#FF6B00]" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Rooms Found</h3>
+                    <p className="text-gray-500">Try adjusting your filters or search query.</p>
                   </div>
-                  <div className="bg-[#FFF5EB] p-2 sm:p-3 rounded-lg sm:rounded-xl">
-                    <FiCalendar className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6B00]" />
+                )}
+              </div>
+
+              {/* Room Details Section */}
+              <div className={`transition-all duration-500 ease-in-out ${
+                showRoomDetails ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full absolute inset-0'
+              }`}>
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <button
+                    onClick={() => {
+                      setSelectedRoom(null)
+                      setRoomSelectedSlots([])
+                      setRoomPurpose('')
+                      setShowRoomDetails(false)
+                    }}
+                    className="mr-3 sm:mr-4 p-1.5 sm:p-2 text-gray-600 hover:text-[#FF6B00] transition-colors"
+                  >
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                      Book: {selectedRoom?.name}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                      Select a date and time to book this room
+                    </p>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 text-gray-900 transform hover:scale-[1.02] transition-transform duration-300 shadow-md border border-[#E6F4EA]">
-                <div className="flex items-center justify-between">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-[#1E7E34] mb-1 sm:mb-2">Total Hours Booked</p>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">{analyticsData.totalHours.toFixed(1)}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">{analyticsData.selectedMonth}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Date</h3>
+                    {selectedRoom?.images && selectedRoom.images.length > 0 && (
+                      <div className="mb-4">
+                        <div className="relative h-48 sm:h-64 rounded-lg sm:rounded-xl overflow-hidden group">
+                          <img
+                            src={selectedRoom.images[activeImageIndices[selectedRoom._id] || 0]}
+                            alt={`${selectedRoom.name} - Room Image ${(activeImageIndices[selectedRoom._id] || 0) + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {selectedRoom.images.length > 1 && (
+                            <>
+                              <button
+                                onClick={(e) => handlePrevImage(selectedRoom._id, e)}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                              >
+                                <FiChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
+                              </button>
+                              <button
+                                onClick={(e) => handleNextImage(selectedRoom._id, e)}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 sm:p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                              >
+                                <FiChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
+                              </button>
+                              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1.5 sm:space-x-2">
+                                {selectedRoom.images.map((_, index) => (
+                                  <div
+                                    key={index}
+                                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-colors duration-200 ${
+                                      (activeImageIndices[selectedRoom._id] || 0) === index ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-6 border border-gray-100">
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DateCalendar
+                          value={roomDate}
+                          onChange={setRoomDate}
+                          minDate={dayjs()}
+                          sx={{
+                            width: '100%',
+                            '.MuiPickersCalendarHeader-root': {
+                              marginBottom: '12px',
+                              padding: '0 4px'
+                            },
+                            '.MuiPickersCalendarHeader-label': {
+                              color: '#111827',
+                              fontWeight: 600,
+                              fontSize: '1rem'
+                            },
+                            '.MuiPickersDay-root': {
+                              color: '#374151',
+                              fontSize: '0.875rem',
+                              fontWeight: 500,
+                              margin: '1px',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '6px',
+                              '&:hover': {
+                                backgroundColor: '#FFF5EB',
+                                color: '#FF6B00'
+                              },
+                              '&.Mui-selected': {
+                                backgroundColor: '#FF6B00',
+                                color: 'white',
+                                '&:hover': {
+                                  backgroundColor: '#FF8F3F'
+                                }
+                              },
+                              '&.Mui-disabled': {
+                                color: '#9CA3AF'
+                              }
+                            },
+                            '.MuiPickersDay-today': {
+                              border: '2px solid #FF6B00',
+                              color: '#FF6B00',
+                              '&.Mui-selected': {
+                                color: 'white'
+                              }
+                            },
+                            '.MuiPickersCalendarHeader-switchHeader': {
+                              marginTop: '4px'
+                            },
+                            '.MuiPickersArrowSwitcher-root': {
+                              margin: '0 4px'
+                            },
+                            '.MuiPickersArrowSwitcher-button': {
+                              color: '#FF6B00',
+                              '&:hover': {
+                                backgroundColor: '#FFF5EB'
+                              }
+                            },
+                            '.MuiPickersCalendarHeader-labelContainer': {
+                              marginLeft: '2px',
+                              marginRight: '2px'
+                            }
+                          }}
+                        />
+                      </LocalizationProvider>
+                    </div>
                   </div>
-                  <div className="bg-[#E6F4EA] p-2 sm:p-3 rounded-lg sm:rounded-xl">
-                    <FiClock className="w-6 h-6 sm:w-8 sm:h-8 text-[#1E7E34]" />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 text-gray-900 transform hover:scale-[1.02] transition-transform duration-300 shadow-md border border-[#FFE4CC]">
-                <div className="flex items-center justify-between">
+
                   <div>
-                    <p className="text-xs sm:text-sm font-medium text-[#FF6B00] mb-1 sm:mb-2">Active Users</p>
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">{analyticsData.userStats.length}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">{analyticsData.selectedMonth}</p>
-                  </div>
-                  <div className="bg-[#FFF5EB] p-2 sm:p-3 rounded-lg sm:rounded-xl">
-                    <FiUsers className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6B00]" />
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Available Time Slots</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
+                      {roomAvailableSlots.length === 0 && (
+                        <div className="col-span-2 sm:col-span-3 text-center py-6 sm:py-8 bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-100">
+                          <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFF5EB] mb-3">
+                            <FiClock className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF6B00]" />
+                          </div>
+                          <p className="text-sm sm:text-base text-gray-500">No available slots for this date.</p>
+                        </div>
+                      )}
+                      {roomAvailableSlots.map((slot, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => slot.isAvailable && handleRoomSlotSelect(slot)}
+                          className={`p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${
+                            !slot.isAvailable
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : roomSelectedSlots.some(
+                                  s => s.startTime === slot.startTime && s.endTime === slot.endTime
+                                )
+                              ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white shadow-md'
+                              : 'bg-white text-gray-700 hover:bg-[#FFF5EB] hover:text-[#FF6B00] border border-gray-200 hover:border-[#FFE4CC] shadow-sm hover:shadow'
+                          }`}
+                          disabled={!slot.isAvailable}
+                        >
+                          <div className="flex items-center justify-center space-x-1">
+                            <FiClock className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
+                              roomSelectedSlots.some(
+                                s => s.startTime === slot.startTime && s.endTime === slot.endTime
+                              ) ? 'text-white' : 'text-[#FF6B00]'
+                            }`} />
+                            <span>{slot.startTime} - {slot.endTime}</span>
+                          </div>
+                          {!slot.isAvailable && (
+                            <span className="block text-xs mt-1 text-gray-400">(Booked)</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    {roomSelectedSlots.length > 0 && (
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-3 sm:p-4 rounded-lg sm:rounded-xl border border-[#FFE4CC]/50">
+                          <h3 className="text-xs sm:text-sm font-medium text-[#FF6B00] mb-2 flex items-center">
+                            <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                            Selected Time Slots
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-[#FF6B00] rounded-lg text-xs sm:text-sm font-medium shadow-sm border border-[#FFE4CC]">
+                              {roomSelectedSlots[0]?.startTime} - {roomSelectedSlots[roomSelectedSlots.length - 1]?.endTime}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="mb-4">
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" htmlFor="roomPurpose">
+                            Meeting Purpose
+                          </label>
+                          <textarea
+                            id="roomPurpose"
+                            value={roomPurpose}
+                            onChange={e => setRoomPurpose(e.target.value)}
+                            placeholder="Describe your meeting purpose..."
+                            rows={3}
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-[#FFE4CC] bg-white text-gray-900 placeholder-gray-500 transition resize-none text-xs sm:text-sm"
+                          />
+                        </div>
+                        <button
+                          onClick={handleBookSelectedRoom}
+                          className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-lg sm:rounded-xl hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200 shadow-md hover:shadow-lg font-medium flex items-center justify-center space-x-2 text-sm sm:text-base"
+                        >
+                          <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <span>Book Selected Slot(s)</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('rooms')
   const [bookingTab, setBookingTab] = useState('pending')
+  const [selectedBookingMonth, setSelectedBookingMonth] = useState(new Date().toISOString().slice(0, 7))
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false)
   const [isEditRoomModalOpen, setIsEditRoomModalOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
@@ -373,26 +374,26 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-100">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-4">
                 <Image 
                   src="/Fiire_logo.jpeg" 
                   alt="Fiire Logo" 
-                  width={64}
-                  height={64}
-                  className="object-contain"
+                  width={48}
+                  height={48}
+                  className="object-contain sm:w-16 sm:h-16"
                   priority
                 />
-                <div className="h-16 w-px bg-gray-200"></div>
+                <div className="h-12 sm:h-16 w-px bg-gray-200"></div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
                 <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     Welcome back, <span className="font-semibold text-[#FF6B00]">{session?.user?.name}</span>
                   </p>
                   <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white rounded-full">
@@ -403,7 +404,7 @@ export default function AdminDashboard() {
             </div>
             <button
               onClick={() => signOut()}
-              className="group flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow"
+              className="w-full sm:w-auto group flex items-center justify-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-[#FFF5EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B00] transition-all duration-200 shadow-sm hover:shadow"
             >
               <span className="text-sm font-medium text-gray-700 group-hover:text-[#FF6B00] transition-colors">Sign out</span>
               <svg className="w-4 h-4 text-gray-500 group-hover:text-[#FF6B00] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,27 +415,27 @@ export default function AdminDashboard() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center space-x-3">
-            <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center space-x-3">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{error}</span>
+            <span className="text-sm sm:text-base">{error}</span>
           </div>
         )}
 
         {/* Navigation Tabs */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-2 border border-gray-100">
-            <nav className="flex space-x-2">
+            <nav className="flex flex-wrap sm:flex-nowrap gap-2">
               <button
                 onClick={() => setActiveTab('rooms')}
                 className={`${
                   activeTab === 'rooms'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2`}
+                } flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center justify-center space-x-2`}
               >
-                <FiImage className="w-4 h-4" />
+                <FiImage className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Rooms</span>
               </button>
               <button
@@ -443,15 +444,15 @@ export default function AdminDashboard() {
                   activeTab === 'bookings'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 relative`}
+                } flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center justify-center space-x-2 relative`}
               >
-                <FiCalendar className="w-4 h-4" />
+                <FiCalendar className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Bookings</span>
                 {bookings.filter(b => b.status === 'pending').length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF6B00] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#FF8F3F] items-center justify-center">
-                      <span className="text-[10px] font-bold text-white">
+                    <span className="relative inline-flex rounded-full h-3 w-3 sm:h-4 sm:w-4 bg-[#FF8F3F] items-center justify-center">
+                      <span className="text-[8px] sm:text-[10px] font-bold text-white">
                         {bookings.filter(b => b.status === 'pending').length}
                       </span>
                     </span>
@@ -464,9 +465,9 @@ export default function AdminDashboard() {
                   activeTab === 'analytics'
                     ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
                     : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
-                } px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2`}
+                } flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center justify-center space-x-2`}
               >
-                <FiBarChart2 className="w-4 h-4" />
+                <FiBarChart2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Analytics</span>
               </button>
             </nav>
@@ -584,10 +585,28 @@ export default function AdminDashboard() {
 
         {activeTab === 'bookings' && (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Booking Requests</h2>
                 <p className="mt-1 text-sm text-gray-500">Manage and monitor meeting room bookings</p>
+              </div>
+              <div className="w-full sm:w-auto">
+                <div className="bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] p-1 rounded-xl shadow-sm">
+                  <div className="flex items-center space-x-2 bg-white rounded-lg p-1">
+                    <FiCalendar className="w-4 h-4 text-[#FF6B00]" />
+                    <select
+                      value={selectedBookingMonth}
+                      onChange={(e) => setSelectedBookingMonth(e.target.value)}
+                      className="block w-full pl-2 pr-8 py-1.5 text-sm border-0 focus:ring-0 focus:outline-none bg-transparent text-gray-900 cursor-pointer"
+                    >
+                      {getMonthOptions().map(option => (
+                        <option key={option.value} value={option.value} className="text-gray-900">
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
             {bookings.length === 0 ? (
@@ -614,7 +633,13 @@ export default function AdminDashboard() {
                       <span className="w-2 h-2 bg-[#FF6B00] rounded-full"></span>
                       <span>Pending</span>
                       <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#FFE4CC] text-[#FF6B00] rounded-full">
-                        {bookings.filter(b => b.status === 'pending').length}
+                        {bookings.filter(b => {
+                          const bookingDate = new Date(b.date);
+                          const [year, month] = selectedBookingMonth.split('-').map(Number);
+                          return b.status === 'pending' && 
+                                 bookingDate.getFullYear() === year && 
+                                 bookingDate.getMonth() === month - 1;
+                        }).length}
                       </span>
                     </button>
                     <button
@@ -628,7 +653,13 @@ export default function AdminDashboard() {
                       <span className="w-2 h-2 bg-[#1E7E34] rounded-full"></span>
                       <span>Approved</span>
                       <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#C6E7CE] text-[#1E7E34] rounded-full">
-                        {bookings.filter(b => b.status === 'approved').length}
+                        {bookings.filter(b => {
+                          const bookingDate = new Date(b.date);
+                          const [year, month] = selectedBookingMonth.split('-').map(Number);
+                          return b.status === 'approved' && 
+                                 bookingDate.getFullYear() === year && 
+                                 bookingDate.getMonth() === month - 1;
+                        }).length}
                       </span>
                     </button>
                     <button
@@ -643,9 +674,12 @@ export default function AdminDashboard() {
                       <span>Completed</span>
                       <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                         {bookings.filter(b => {
-                          if (b.status !== 'approved') return false;
-                          const bookingDateTime = new Date(`${b.date}T${b.endTime}`);
-                          return bookingDateTime < new Date();
+                          const bookingDate = new Date(b.date);
+                          const [year, month] = selectedBookingMonth.split('-').map(Number);
+                          return b.status === 'approved' && 
+                                 bookingDate.getFullYear() === year && 
+                                 bookingDate.getMonth() === month - 1 &&
+                                 new Date(`${b.date}T${b.endTime}`) < new Date();
                         }).length}
                       </span>
                     </button>
@@ -660,7 +694,13 @@ export default function AdminDashboard() {
                       <span className="w-2 h-2 bg-red-400 rounded-full"></span>
                       <span>Rejected</span>
                       <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                        {bookings.filter(b => b.status === 'rejected').length}
+                        {bookings.filter(b => {
+                          const bookingDate = new Date(b.date);
+                          const [year, month] = selectedBookingMonth.split('-').map(Number);
+                          return b.status === 'rejected' && 
+                                 bookingDate.getFullYear() === year && 
+                                 bookingDate.getMonth() === month - 1;
+                        }).length}
                       </span>
                     </button>
                   </nav>
@@ -670,6 +710,13 @@ export default function AdminDashboard() {
                 <div className="space-y-6">
                   {bookings
                     .filter(booking => {
+                      const bookingDate = new Date(booking.date);
+                      const [year, month] = selectedBookingMonth.split('-').map(Number);
+                      const isInSelectedMonth = bookingDate.getFullYear() === year && 
+                                             bookingDate.getMonth() === month - 1;
+                      
+                      if (!isInSelectedMonth) return false;
+                      
                       if (bookingTab === 'completed') {
                         return booking.status === 'approved' && 
                           new Date(`${booking.date}T${booking.endTime}`) < new Date();
@@ -692,6 +739,13 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   {bookings.filter(booking => {
+                    const bookingDate = new Date(booking.date);
+                    const [year, month] = selectedBookingMonth.split('-').map(Number);
+                    const isInSelectedMonth = bookingDate.getFullYear() === year && 
+                                           bookingDate.getMonth() === month - 1;
+                    
+                    if (!isInSelectedMonth) return false;
+                    
                     if (bookingTab === 'completed') {
                       return booking.status === 'approved' && 
                         new Date(`${booking.date}T${booking.endTime}`) < new Date();
@@ -703,10 +757,10 @@ export default function AdminDashboard() {
                         <FiCalendar className="w-8 h-8 text-gray-400" />
                       </div>
                       <p className="text-gray-500">
-                        {bookingTab === 'pending' && 'No pending requests'}
-                        {bookingTab === 'approved' && 'No approved bookings'}
-                        {bookingTab === 'completed' && 'No completed bookings'}
-                        {bookingTab === 'rejected' && 'No rejected bookings'}
+                        {bookingTab === 'pending' && 'No pending requests for this month'}
+                        {bookingTab === 'approved' && 'No approved bookings for this month'}
+                        {bookingTab === 'completed' && 'No completed bookings for this month'}
+                        {bookingTab === 'rejected' && 'No rejected bookings for this month'}
                       </p>
                     </div>
                   )}
@@ -1110,86 +1164,86 @@ const BookingCard = ({ booking, onApprove, onReject }) => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <FiCalendar className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <FiCalendar className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">
-              {booking.room?.name}
-            </h3>
-                <div className="flex items-center space-x-2 mt-1">
-                  <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                isCompleted
-                  ? 'bg-blue-100 text-blue-800'
-                  : booking.status === 'approved'
-                  ? 'bg-green-100 text-green-800'
-                  : booking.status === 'rejected'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-yellow-100 text-yellow-800'
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                  {booking.room?.name}
+                </h3>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${
+                    isCompleted
+                      ? 'bg-blue-100 text-blue-800'
+                      : booking.status === 'approved'
+                      ? 'bg-green-100 text-green-800'
+                      : booking.status === 'rejected'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-yellow-100 text-yellow-800'
                   }`}>
-              {isCompleted ? 'Completed' : booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-            </span>
+                    {isCompleted ? 'Completed' : booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                  </span>
                   {booking.user?.startupName && (
                     <span className="px-2 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">
                       {booking.user.startupName}
                     </span>
                   )}
-          </div>
+                </div>
               </div>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-              <div className="flex-shrink-0 w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-                <FiCalendar className="w-5 h-5 text-indigo-600" />
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">
-                {new Date(booking.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+                <p className="text-xs sm:text-sm font-medium text-gray-900">
+                  {new Date(booking.date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </p>
-                <p className="text-sm text-gray-500">Date</p>
-            </div>
+                <p className="text-xs sm:text-sm text-gray-500">Date</p>
+              </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-              <div className="flex-shrink-0 w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-                <FiClock className="w-5 h-5 text-indigo-600" />
-          </div>
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <FiClock className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+              </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">{booking.startTime} - {booking.endTime}</p>
-                <p className="text-sm text-gray-500">Time</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-900">{booking.startTime} - {booking.endTime}</p>
+                <p className="text-xs sm:text-sm text-gray-500">Time</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl mb-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-              <FiUsers className="w-5 h-5 text-indigo-600" />
+          <div className="flex items-start space-x-3 p-3 sm:p-4 bg-gray-50 rounded-xl mb-4">
+            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+              <FiUsers className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">{booking.user?.name}</p>
-              <p className="text-sm text-gray-500">{booking.user?.email}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-900">{booking.user?.name}</p>
+              <p className="text-xs sm:text-sm text-gray-500">{booking.user?.email}</p>
             </div>
           </div>
 
           {booking.purpose && (
-            <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
-              <div className="flex-shrink-0 w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-                <FiInfo className="w-5 h-5 text-indigo-600" />
+            <div className="flex items-start space-x-3 p-3 sm:p-4 bg-gray-50 rounded-xl">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <FiInfo className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 mb-1">Purpose</p>
-                <p className="text-sm text-gray-600 italic">
+                <p className="text-xs sm:text-sm font-medium text-gray-900 mb-1">Purpose</p>
+                <p className="text-xs sm:text-sm text-gray-600 italic">
                   {booking.purpose}
                 </p>
               </div>
@@ -1198,44 +1252,44 @@ const BookingCard = ({ booking, onApprove, onReject }) => {
         </div>
 
         {booking.status === 'pending' && (
-          <div className="flex flex-col sm:flex-row gap-3 sm:ml-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:ml-4">
             <button
               onClick={handleApprove}
               disabled={isApproving || isRejecting}
-              className="group flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isApproving ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span className="font-medium">Approving...</span>
+                  <span className="text-xs sm:text-sm font-medium">Approving...</span>
                 </>
               ) : (
                 <>
-                  <FiCheck className="w-5 h-5" />
-                  <span className="font-medium">Approve</span>
+                  <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Approve</span>
                 </>
               )}
             </button>
             <button
               onClick={handleReject}
               disabled={isApproving || isRejecting}
-              className="group flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isRejecting ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-                  <span className="font-medium">Rejecting...</span>
+                  </svg>
+                  <span className="text-xs sm:text-sm font-medium">Rejecting...</span>
                 </>
               ) : (
                 <>
-                  <FiX className="w-5 h-5" />
-                  <span className="font-medium">Reject</span>
+                  <FiX className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Reject</span>
                 </>
               )}
             </button>

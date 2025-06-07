@@ -1,41 +1,43 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi'
+import { FiMail, FiAlertCircle, FiCheckCircle } from 'react-icons/fi'
 
-export default function Login() {
+export default function ForgotPassword() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const [email, setEmail] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess('')
 
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email: formData.email,
-        password: formData.password,
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       })
 
-      if (result.error) {
-        setError('Invalid email or password')
-        return
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong')
       }
 
-      router.push('/dashboard')
+      setSuccess('Password reset instructions have been sent to your email.')
+      setEmail('')
     } catch (error) {
-      setError('An error occurred. Please try again.')
+      setError(error.message || 'An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -56,18 +58,11 @@ export default function Login() {
         </div>
         <div className="mt-4 text-center">
           <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F]">
-            Welcome Back
+            Reset Password
           </h2>
-          <div className="mt-2 flex items-center justify-center space-x-2">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-gray-300"></div>
-            <p className="text-sm text-gray-500">
-              Or{' '}
-              <Link href="/register" className="font-medium text-[#FF6B00] hover:text-[#FF8F3F] transition-colors duration-200">
-                create a new account
-              </Link>
-            </p>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-gray-300"></div>
-          </div>
+          <p className="mt-2 text-sm text-gray-600">
+            Enter your email address and we'll send you instructions to reset your password.
+          </p>
         </div>
       </div>
 
@@ -81,6 +76,19 @@ export default function Login() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-4 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <FiCheckCircle className="h-5 w-5 text-green-400" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-green-700">{success}</p>
                 </div>
               </div>
             </div>
@@ -101,40 +109,12 @@ export default function Login() {
                   type="email"
                   autoComplete="email"
                   required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
                   placeholder="Enter your email"
                 />
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiLock className="h-5 w-5 text-[#FF6B00]" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/20 focus:border-[#FF6B00] sm:text-sm bg-white text-gray-900 placeholder-gray-500 transition-colors duration-200"
-                  placeholder="Enter your password"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end">
-              <Link href="/forgot-password" className="text-sm font-medium text-[#FF6B00] hover:text-[#FF8F3F] transition-colors duration-200">
-                Forgot your password?
-              </Link>
             </div>
 
             <div>
@@ -151,12 +131,18 @@ export default function Login() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Signing in...
+                    Sending...
                   </div>
                 ) : (
-                  'Sign in'
+                  'Send Reset Instructions'
                 )}
               </button>
+            </div>
+
+            <div className="text-center">
+              <Link href="/login" className="text-sm font-medium text-[#FF6B00] hover:text-[#FF8F3F] transition-colors duration-200">
+                Back to Login
+              </Link>
             </div>
           </form>
         </div>

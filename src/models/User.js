@@ -23,10 +23,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resetToken: String,
+  resetTokenExpiry: Date,
   createdAt: {
     type: Date,
     default: Date.now,
   },
+}, {
+  timestamps: true,
 })
 
 const User = mongoose.models.User || mongoose.model('User', userSchema)

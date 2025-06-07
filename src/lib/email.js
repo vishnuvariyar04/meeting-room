@@ -1,7 +1,25 @@
-import sgMail from '@sendgrid/mail';
+import sgMail from '@sendgrid/mail'
 
 // Initialize SendGrid
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
+export async function sendEmail({ to, subject, html }) {
+  try {
+    const msg = {
+      to,
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject,
+      html,
+    }
+
+    await sgMail.send(msg)
+    console.log('Email sent successfully')
+    return true
+  } catch (error) {
+    console.error('Error sending email:', error)
+    throw error
+  }
+}
 
 // Email templates
 const emailTemplates = {
@@ -103,32 +121,22 @@ const emailTemplates = {
 };
 
 // Email sending functions
-export const sendEmail = async (emailData) => {
-  try {
-    await sgMail.send(emailData);
-    return true;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return false;
-  }
-};
-
 export const sendBookingConfirmation = async (userEmail, bookingDetails) => {
-  const emailData = emailTemplates.bookingConfirmation({ ...bookingDetails, userEmail });
-  return sendEmail(emailData);
-};
+  const emailData = emailTemplates.bookingConfirmation({ ...bookingDetails, userEmail })
+  return sendEmail(emailData)
+}
 
 export const sendAdminNotification = async (adminEmail, bookingDetails) => {
-  const emailData = emailTemplates.adminNotification(bookingDetails);
-  return sendEmail(emailData);
-};
+  const emailData = emailTemplates.adminNotification(bookingDetails)
+  return sendEmail(emailData)
+}
 
 export const sendApprovalRequest = async (adminEmail, bookingDetails) => {
-  const emailData = emailTemplates.approvalRequest(bookingDetails);
-  return sendEmail(emailData);
-};
+  const emailData = emailTemplates.approvalRequest(bookingDetails)
+  return sendEmail(emailData)
+}
 
 export const sendApprovalStatus = async (userEmail, bookingDetails, status) => {
-  const emailData = emailTemplates.approvalStatus({ ...bookingDetails, userEmail }, status);
-  return sendEmail(emailData);
-}; 
+  const emailData = emailTemplates.approvalStatus({ ...bookingDetails, userEmail }, status)
+  return sendEmail(emailData)
+} 

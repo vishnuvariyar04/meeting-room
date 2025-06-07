@@ -45,6 +45,7 @@ export default function UserDashboard() {
   })
   const [activeImageIndices, setActiveImageIndices] = useState({})
   const [selectedMonth, setSelectedMonth] = useState(dayjs().format('YYYY-MM'))
+  const [activeBookingStatus, setActiveBookingStatus] = useState('All')
 
   useEffect(() => {
     fetchRooms()
@@ -865,18 +866,18 @@ export default function UserDashboard() {
         )}
 
         {activeTab === 'bookings' && (
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-100">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-8 border border-gray-100">
+            <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">My Bookings</h2>
-                <p className="mt-1 text-sm text-gray-500">View and manage your meeting room bookings</p>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">My Bookings</h2>
+                <p className="mt-1 text-xs sm:text-sm text-gray-500">View and manage your meeting room bookings</p>
               </div>
-              <div className="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <div className="w-full sm:w-auto flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:space-x-4">
                 <div className="relative w-full sm:w-auto">
                   <select
                     value={selectedMonth}
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-[#FFE4CC] transition-all duration-200 appearance-none cursor-pointer hover:border-[#FF6B00]/50"
+                    className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg sm:rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-[#FFE4CC] transition-all duration-200 appearance-none cursor-pointer hover:border-[#FF6B00]/50"
                     style={{
                       WebkitAppearance: 'none',
                       MozAppearance: 'none'
@@ -892,22 +893,22 @@ export default function UserDashboard() {
                       );
                     })}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 sm:px-3 pointer-events-none">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </div>
-                <div className="w-full sm:w-auto bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] px-4 sm:px-6 py-3 rounded-xl shadow-sm border border-[#FFE4CC]/50">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-white p-2 rounded-lg shadow-sm">
-                      <FiClock className="w-5 h-5 text-[#FF6B00]" />
+                <div className="w-full sm:w-auto bg-gradient-to-r from-[#FFF5EB] to-[#FFE4CC] px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl shadow-sm border border-[#FFE4CC]/50">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <div className="bg-white p-1.5 sm:p-2 rounded-lg shadow-sm">
+                      <FiClock className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B00]" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-[#FF6B00]">Monthly Booking Hours</p>
-                      <p className="text-base sm:text-lg font-bold text-gray-900">
+                      <p className="text-xs sm:text-sm font-medium text-[#FF6B00]">Monthly Booking Hours</p>
+                      <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
                         {getMonthlyBookedHours()} / 8 hours
-                        <span className="text-xs sm:text-sm font-normal text-gray-500 ml-2">
+                        <span className="text-xs sm:text-sm font-normal text-gray-500 ml-1 sm:ml-2">
                           ({dayjs(selectedMonth).format('MMMM YYYY')})
                         </span>
                       </p>
@@ -917,35 +918,96 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            {getFilteredBookings().length === 0 ? (
-              <div className="text-center py-12 sm:py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
-                <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#FFF5EB] mb-4 sm:mb-6">
-                  <FiCalendar className="w-8 h-8 sm:w-10 sm:h-10 text-[#FF6B00]" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Bookings Found</h3>
-                <p className="text-sm sm:text-base text-gray-500 max-w-md mx-auto px-4">No bookings found for the selected month. Try selecting a different month or make a new booking.</p>
+            {/* Upcoming Meetings Section */}
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">Upcoming Meetings (Next 10 Days)</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {getFilteredBookings()
+                  .filter(booking => {
+                    const bookingDate = dayjs(booking.date);
+                    const today = dayjs();
+                    const tenDaysFromNow = today.add(10, 'day');
+                    return bookingDate.isAfter(today.subtract(1, 'day')) && 
+                           bookingDate.isBefore(tenDaysFromNow.add(1, 'day')) &&
+                           booking.status === 'approved';
+                  })
+                  .map((booking) => (
+                    <div
+                      key={booking._id}
+                      className="bg-white border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="flex items-start justify-between mb-2 sm:mb-3">
+                        <div>
+                          <h4 className="text-sm sm:text-base font-semibold text-gray-900">{booking.room?.name}</h4>
+                          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+                            {dayjs(booking.date).format('MMM D, YYYY')}
+                          </p>
+                        </div>
+                        <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          Upcoming
+                        </span>
+                      </div>
+                      <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
+                        <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-[#FF6B00]" />
+                        {booking.startTime} - {booking.endTime}
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{booking.purpose}</p>
+                    </div>
+                  ))}
               </div>
-            ) : (
-              <div className="space-y-4 sm:space-y-6">
-                {getFilteredBookings().map((booking) => (
+            </div>
+
+            {/* Booking Status Tabs */}
+            <div className="mb-4 sm:mb-6">
+              <div className="border-b border-gray-200">
+                <nav className="flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto pb-2" aria-label="Tabs">
+                  {['All', 'Pending', 'Approved', 'Rejected', 'Completed'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setActiveBookingStatus(status)}
+                      className={`${
+                        activeBookingStatus === status
+                          ? 'border-[#FF6B00] text-[#FF6B00]'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      } whitespace-nowrap py-1.5 sm:py-2 px-1 sm:px-2 border-b-2 font-medium text-xs sm:text-sm md:text-base transition-colors duration-200`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+
+            {/* Bookings List */}
+            <div className="space-y-3 sm:space-y-4 md:space-y-6">
+              {getFilteredBookings()
+                .filter(booking => {
+                  if (activeBookingStatus === 'All') return true;
+                  if (activeBookingStatus === 'Completed') {
+                    return booking.status === 'approved' && 
+                           new Date(`${booking.date}T${booking.endTime}`) < new Date();
+                  }
+                  return booking.status.toLowerCase() === activeBookingStatus.toLowerCase();
+                })
+                .map((booking) => (
                   <div
                     key={booking._id}
-                    className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300"
+                    className="group bg-white border border-gray-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300"
                   >
-                    <div className="p-4 sm:p-6">
-                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 sm:gap-6">
+                    <div className="p-3 sm:p-4 md:p-6">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 sm:gap-4 md:gap-6">
                         <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-3 mb-4">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#FFF5EB] to-[#FFE4CC] rounded-xl flex items-center justify-center">
-                                <FiHome className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF6B00]" />
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                            <div className="flex items-center space-x-2 sm:space-x-3">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-[#FFF5EB] to-[#FFE4CC] rounded-lg sm:rounded-xl flex items-center justify-center">
+                                <FiHome className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#FF6B00]" />
                               </div>
                               <div>
-                                <h3 className="text-base sm:text-lg font-bold text-gray-900">
+                                <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
                                   {booking.room?.name}
                                 </h3>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${
+                                <div className="flex items-center space-x-1.5 sm:space-x-2 mt-0.5 sm:mt-1">
+                                  <span className={`px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-full ${
                                     booking.status === 'approved' && new Date(`${booking.date}T${booking.endTime}`) < new Date()
                                       ? 'bg-blue-100 text-blue-800'
                                       : booking.status === 'approved'
@@ -963,10 +1025,10 @@ export default function UserDashboard() {
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-                            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
-                                <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B00]" />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-3 sm:mb-4">
+                            <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
+                                <FiCalendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-[#FF6B00]" />
                               </div>
                               <div>
                                 <p className="text-xs sm:text-sm font-medium text-gray-900">
@@ -980,9 +1042,9 @@ export default function UserDashboard() {
                                 <p className="text-xs sm:text-sm text-gray-500">Date</p>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
-                              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
-                                <FiClock className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B00]" />
+                            <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
+                              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
+                                <FiClock className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-[#FF6B00]" />
                               </div>
                               <div>
                                 <p className="text-xs sm:text-sm font-medium text-gray-900">{booking.startTime} - {booking.endTime}</p>
@@ -992,12 +1054,12 @@ export default function UserDashboard() {
                           </div>
 
                           {booking.purpose && (
-                            <div className="flex items-start space-x-3 p-3 sm:p-4 bg-gray-50 rounded-xl">
-                              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
-                                <FiInfo className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6B00]" />
+                            <div className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 md:p-4 bg-gray-50 rounded-lg sm:rounded-xl">
+                              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-[#FFF5EB] rounded-lg flex items-center justify-center">
+                                <FiInfo className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-[#FF6B00]" />
                               </div>
                               <div>
-                                <p className="text-xs sm:text-sm font-medium text-gray-900 mb-1">Purpose</p>
+                                <p className="text-xs sm:text-sm font-medium text-gray-900 mb-0.5 sm:mb-1">Purpose</p>
                                 <p className="text-xs sm:text-sm text-gray-600 italic">
                                   {booking.purpose}
                                 </p>
@@ -1009,8 +1071,7 @@ export default function UserDashboard() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
+            </div>
           </div>
         )}
 

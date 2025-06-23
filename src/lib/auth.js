@@ -24,6 +24,17 @@ export const authOptions = {
             throw new Error('No user found with this email')
           }
 
+          // Check if user is approved
+          if (user.status !== 'approved') {
+            if (user.status === 'pending') {
+              throw new Error('Your account is pending approval. Please wait for admin approval.')
+            } else if (user.status === 'rejected') {
+              throw new Error('Your account has been rejected. Please contact admin for more information.')
+            } else {
+              throw new Error('Your account status is invalid. Please contact admin.')
+            }
+          }
+
           const isValid = await bcrypt.compare(credentials.password, user.password)
           if (!isValid) {
             throw new Error('Invalid password')
@@ -35,6 +46,7 @@ export const authOptions = {
             email: user.email,
             role: user.role,
             startupName: user.startupName,
+            status: user.status,
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -49,6 +61,7 @@ export const authOptions = {
         token.id = user.id
         token.role = user.role
         token.startupName = user.startupName
+        token.status = user.status
       }
       return token
     },
@@ -57,6 +70,7 @@ export const authOptions = {
         session.user.id = token.id
         session.user.role = token.role
         session.user.startupName = token.startupName
+        session.user.status = token.status
       }
       return session
     },

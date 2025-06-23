@@ -6,22 +6,25 @@ import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import AddRoomModal from '../modals/AddRoomModal'
 import EditRoomModal from '../modals/EditRoomModal'
-import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiCalendar, FiClock, FiUsers, FiInfo, FiImage, FiChevronLeft, FiChevronRight, FiBarChart2, FiPieChart, FiTrendingUp } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiCalendar, FiClock, FiUsers, FiInfo, FiImage, FiChevronLeft, FiChevronRight, FiBarChart2, FiPieChart, FiTrendingUp, FiUserPlus, FiMail } from 'react-icons/fi'
 
 export default function AdminDashboard() {
   const { data: session } = useSession()
   const [rooms, setRooms] = useState([])
   const [bookings, setBookings] = useState([])
   const [allUsers, setAllUsers] = useState([])
+  const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('rooms')
   const [bookingTab, setBookingTab] = useState('pending')
+  const [registrationTab, setRegistrationTab] = useState('pending')
   const [selectedBookingMonth, setSelectedBookingMonth] = useState(new Date().toISOString().slice(0, 7))
   const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false)
   const [isEditRoomModalOpen, setIsEditRoomModalOpen] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState(null)
   const [error, setError] = useState(null)
   const [highlightedBookingId, setHighlightedBookingId] = useState(null)
+  const [highlightedRegistrationId, setHighlightedRegistrationId] = useState(null)
   const [activeImageIndices, setActiveImageIndices] = useState({})
   const [analyticsData, setAnalyticsData] = useState({
     totalBookings: 0,
@@ -34,6 +37,7 @@ export default function AdminDashboard() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [userTypeTab, setUserTypeTab] = useState('incubated');
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingRegistrationCount, setPendingRegistrationCount] = useState(0);
 
   useEffect(() => {
     // Get URL parameters
@@ -41,6 +45,7 @@ export default function AdminDashboard() {
     const tab = params.get('tab')
     const status = params.get('status')
     const bookingId = params.get('bookingId')
+    const registrationId = params.get('registrationId')
     const error = params.get('error')
 
     if (tab === 'bookings') {
@@ -60,9 +65,27 @@ export default function AdminDashboard() {
       }
     }
 
+    if (tab === 'registrations') {
+      setActiveTab('registrations')
+      if (status) {
+        setRegistrationTab(status)
+      }
+      if (registrationId) {
+        setHighlightedRegistrationId(registrationId)
+        // Remove highlight after 5 seconds
+        setTimeout(() => setHighlightedRegistrationId(null), 5000)
+      }
+      if (error) {
+        setError(error)
+        // Clear error after 5 seconds
+        setTimeout(() => setError(null), 5000)
+      }
+    }
+
     fetchRooms()
     fetchBookings()
     fetchAllUsers()
+    fetchRegistrations()
   }, [])
 
   useEffect(() => {
@@ -70,6 +93,12 @@ export default function AdminDashboard() {
     const count = bookings.filter(b => b.status === 'pending').length;
     setPendingCount(count);
   }, [bookings]);
+
+  useEffect(() => {
+    // Update pending registration count whenever registrations change
+    const count = registrations.filter(r => r.status === 'pending').length;
+    setPendingRegistrationCount(count);
+  }, [registrations]);
 
   const fetchRooms = async () => {
     try {
@@ -110,6 +139,22 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error fetching users:', error)
       setError('Failed to load users')
+    }
+  }
+
+  const fetchRegistrations = async () => {
+    try {
+      const response = await fetch('/api/admin/registrations', {
+        credentials: 'include'
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch registrations')
+      }
+      const data = await response.json()
+      setRegistrations(data)
+    } catch (error) {
+      console.error('Error fetching registrations:', error)
+      setError('Failed to load registrations')
     }
   }
 
@@ -228,6 +273,52 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error rejecting booking:', error)
       alert('Error rejecting booking')
+    }
+  }
+
+  const handleApproveRegistration = async (registrationId) => {
+    try {
+      const response = await fetch(`/api/admin/registrations/approve/${registrationId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      })
+
+      if (response.ok) {
+        fetchRegistrations()
+        fetchAllUsers() // Refresh users list
+      } else {
+        const error = await response.json()
+        alert(error.message || 'Error approving registration')
+      }
+    } catch (error) {
+      console.error('Error approving registration:', error)
+      alert('Error approving registration')
+    }
+  }
+
+  const handleRejectRegistration = async (registrationId, rejectionReason) => {
+    try {
+      const response = await fetch(`/api/admin/registrations/reject/${registrationId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ rejectionReason }),
+      })
+
+      if (response.ok) {
+        fetchRegistrations()
+      } else {
+        const error = await response.json()
+        alert(error.message || 'Error rejecting registration')
+      }
+    } catch (error) {
+      console.error('Error rejecting registration:', error)
+      alert('Error rejecting registration')
     }
   }
 
@@ -476,6 +567,27 @@ export default function AdminDashboard() {
               >
                 <FiBarChart2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Analytics</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('registrations')}
+                className={`${
+                  activeTab === 'registrations'
+                    ? 'bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white'
+                    : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB]'
+                } flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 flex items-center justify-center space-x-2 relative`}
+              >
+                <FiUsers className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Registrations</span>
+                {registrations.filter(r => r.status === 'pending').length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#FF6B00] opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-[#FF8F3F] items-center justify-center">
+                      <span className="text-[10px] sm:text-xs font-bold text-white">
+                        {registrations.filter(r => r.status === 'pending').length}
+                      </span>
+                    </span>
+                  </span>
+                )}
               </button>
             </nav>
           </div>
@@ -774,6 +886,109 @@ export default function AdminDashboard() {
                         {bookingTab === 'approved' && 'No approved bookings for this month'}
                         {bookingTab === 'completed' && 'No completed bookings for this month'}
                         {bookingTab === 'rejected' && 'No rejected bookings for this month'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'registrations' && (
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Registration Requests</h2>
+                <p className="mt-1 text-sm text-gray-500">Manage and approve new user registrations</p>
+              </div>
+            </div>
+            {registrations.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-50 mb-6">
+                  <FiUserPlus className="w-10 h-10 text-indigo-500" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Registration Requests</h3>
+                <p className="text-gray-500 max-w-md mx-auto">There are no registration requests at the moment. New requests will appear here.</p>
+              </div>
+            ) : (
+              <div>
+                {/* Registration Status Tabs */}
+                <div className="bg-white rounded-xl shadow-sm p-2 mb-8 border border-gray-100">
+                  <nav className="flex flex-wrap sm:flex-nowrap gap-2">
+                    <button
+                      onClick={() => setRegistrationTab('pending')}
+                      className={`${
+                        registrationTab === 'pending'
+                          ? 'bg-[#FFF5EB] text-[#FF6B00] border-[#FFE4CC]'
+                          : 'text-gray-500 hover:text-[#FF6B00] hover:bg-[#FFF5EB] border-transparent'
+                      } flex-1 sm:flex-none px-4 py-3 rounded-lg border-2 font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-2`}
+                    >
+                      <span className="w-2 h-2 bg-[#FF6B00] rounded-full"></span>
+                      <span>Pending</span>
+                      <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#FFE4CC] text-[#FF6B00] rounded-full">
+                        {pendingRegistrationCount}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setRegistrationTab('approved')}
+                      className={`${
+                        registrationTab === 'approved'
+                          ? 'bg-[#E6F4EA] text-[#1E7E34] border-[#C6E7CE]'
+                          : 'text-gray-500 hover:text-[#1E7E34] hover:bg-[#E6F4EA] border-transparent'
+                      } flex-1 sm:flex-none px-4 py-3 rounded-lg border-2 font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-2`}
+                    >
+                      <span className="w-2 h-2 bg-[#1E7E34] rounded-full"></span>
+                      <span>Approved</span>
+                      <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[#C6E7CE] text-[#1E7E34] rounded-full">
+                        {registrations.filter(r => r.status === 'approved').length}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setRegistrationTab('rejected')}
+                      className={`${
+                        registrationTab === 'rejected'
+                          ? 'bg-red-50 text-red-700 border-red-200'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-transparent'
+                      } flex-1 sm:flex-none px-4 py-3 rounded-lg border-2 font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-2`}
+                    >
+                      <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                      <span>Rejected</span>
+                      <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                        {registrations.filter(r => r.status === 'rejected').length}
+                      </span>
+                    </button>
+                  </nav>
+                </div>
+
+                {/* Registration Content */}
+                <div className="space-y-6">
+                  {registrations
+                    .filter(registration => registration.status === registrationTab)
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((registration) => (
+                      <div
+                        key={registration._id}
+                        className={`bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 ${
+                          highlightedRegistrationId === registration._id ? 'ring-2 ring-indigo-500' : ''
+                        }`}
+                      >
+                        <RegistrationCard
+                          registration={registration}
+                          onApprove={() => handleApproveRegistration(registration._id)}
+                          onReject={(reason) => handleRejectRegistration(registration._id, reason)}
+                        />
+                      </div>
+                    ))}
+                  {registrations.filter(registration => registration.status === registrationTab).length === 0 && (
+                    <div className="text-center py-12 bg-gray-50 rounded-2xl">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                        <FiUserPlus className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500">
+                        {registrationTab === 'pending' && 'No pending registration requests'}
+                        {registrationTab === 'approved' && 'No approved registrations'}
+                        {registrationTab === 'rejected' && 'No rejected registrations'}
                       </p>
                     </div>
                   )}
@@ -1308,5 +1523,192 @@ const BookingCard = ({ booking, onApprove, onReject }) => {
         )}
       </div>
     </div>
+  )
+}
+
+const RegistrationCard = ({ registration, onApprove, onReject }) => {
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
+
+  const handleApprove = async () => {
+    setIsApproving(true);
+    try {
+      await onApprove();
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      alert('Please provide a reason for rejection');
+      return;
+    }
+    setIsRejecting(true);
+    try {
+      await onReject(rejectionReason);
+      setShowRejectionModal(false);
+      setRejectionReason('');
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                  <FiUserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">{registration.name}</h3>
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${
+                      registration.status === 'approved'
+                        ? 'bg-green-100 text-green-800'
+                        : registration.status === 'rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {registration.status.charAt(0).toUpperCase() + registration.status.slice(1)}
+                    </span>
+                    <span className="px-2 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">
+                      {registration.role.charAt(0).toUpperCase() + registration.role.slice(1)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                  <FiMail className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-900">{registration.email}</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Email</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                  <FiCalendar className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-900">
+                    {new Date(registration.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-500">Requested</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 p-3 sm:p-4 bg-gray-50 rounded-xl">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <FiInfo className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-900 mb-1">Startup Name</p>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  {registration.startupName}
+                </p>
+              </div>
+            </div>
+
+            {registration.status === 'rejected' && registration.rejectionReason && (
+              <div className="flex items-start space-x-3 p-3 sm:p-4 bg-red-50 rounded-xl mt-4">
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <FiX className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-red-900 mb-1">Rejection Reason</p>
+                  <p className="text-xs sm:text-sm text-red-700">
+                    {registration.rejectionReason}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {registration.status === 'pending' && (
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:ml-4">
+              <button
+                onClick={handleApprove}
+                disabled={isApproving || isRejecting}
+                className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isApproving ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-xs sm:text-sm font-medium">Approving...</span>
+                  </>
+                ) : (
+                  <>
+                    <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="text-xs sm:text-sm font-medium">Approve</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setShowRejectionModal(true)}
+                disabled={isApproving || isRejecting}
+                className="group flex items-center justify-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FiX className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Reject</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Rejection Modal */}
+      {showRejectionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Reject Registration</h3>
+            <p className="text-sm text-gray-600 mb-4">Please provide a reason for rejecting this registration request:</p>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+              rows="3"
+            />
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowRejectionModal(false);
+                  setRejectionReason('');
+                }}
+                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={isRejecting || !rejectionReason.trim()}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRejecting ? 'Rejecting...' : 'Reject'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 } 

@@ -28,6 +28,7 @@ export async function POST(req) {
       password: hashedPassword,
       role: 'admin',
       startupName: 'FiiRE Admin',
+      status: 'approved',
     })
 
     return NextResponse.json(

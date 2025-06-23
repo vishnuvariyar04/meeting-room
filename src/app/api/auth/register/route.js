@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
+import { sendRegistrationApprovalRequest } from '@/lib/email'
 
 export async function POST(request) {
   try {
@@ -42,25 +43,38 @@ export async function POST(request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create user
+    // Create user with pending status
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
       startupName,
       role: role || 'external', // Default to external if not specified
+      status: 'pending', // Set status to pending for approval
     })
 
-    console.log('User created successfully:', { id: user._id, email: user.email })
+    console.log('User registration request created successfully:', { id: user._id, email: user.email })
+
+    // Send email notification to admin
+    try {
+      await sendRegistrationApprovalRequest(user)
+      console.log('Registration approval email sent to admin')
+    } catch (emailError) {
+      console.error('Error sending registration approval email:', emailError)
+      // Don't fail the registration if email fails
+    }
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user.toObject()
 
-    return NextResponse.json(userWithoutPassword)
+    return NextResponse.json({
+      message: 'Registration request submitted successfully. Please wait for admin approval.',
+      user: userWithoutPassword
+    })
   } catch (error) {
     console.error('Error in registration:', error)
     return NextResponse.json(
-      { error: error.message || 'Error creating user' },
+      { error: error.message || 'Error creating registration request' },
       { status: 500 }
     )
   }

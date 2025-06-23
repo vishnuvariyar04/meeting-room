@@ -125,6 +125,67 @@ const emailTemplates = {
         </div>
       </div>
     `
+  }),
+
+  registrationApprovalRequest: (registrationDetails) => ({
+    to: process.env.ADMIN_EMAIL,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: 'New User Registration Approval Request',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #1a202c; margin-bottom: 20px;">New User Registration Request</h2>
+        <p style="color: #4a5568; margin-bottom: 15px;">A new user registration requires your approval:</p>
+        
+        <div style="background-color: #f7fafc; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+          <p style="margin: 5px 0;"><strong>Name:</strong> ${registrationDetails.name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${registrationDetails.email}</p>
+          <p style="margin: 5px 0;"><strong>Startup Name:</strong> ${registrationDetails.startupName}</p>
+          <p style="margin: 5px 0;"><strong>Role:</strong> ${registrationDetails.role.charAt(0).toUpperCase() + registrationDetails.role.slice(1)}</p>
+          <p style="margin: 5px 0;"><strong>Requested on:</strong> ${new Date(registrationDetails.createdAt).toLocaleDateString()}</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/registrations/approve/${registrationDetails._id}" 
+             style="display: inline-block; background-color: #48bb78; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-right: 10px;">
+            Approve
+          </a>
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/admin/registrations/reject/${registrationDetails._id}" 
+             style="display: inline-block; background-color: #f56565; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+            Reject
+          </a>
+        </div>
+      </div>
+    `
+  }),
+
+  registrationStatus: (registrationDetails, status, rejectionReason = '') => ({
+    to: registrationDetails.email,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: `Registration ${status === 'approved' ? 'Approved' : 'Rejected'}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #1a202c; margin-bottom: 20px;">Registration ${status === 'approved' ? 'Approved' : 'Rejected'}</h2>
+        <p style="color: #4a5568; margin-bottom: 15px;">Your registration request has been ${status}:</p>
+        
+        <div style="background-color: #f7fafc; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+          <p style="margin: 5px 0;"><strong>Name:</strong> ${registrationDetails.name}</p>
+          <p style="margin: 5px 0;"><strong>Email:</strong> ${registrationDetails.email}</p>
+          <p style="margin: 5px 0;"><strong>Startup Name:</strong> ${registrationDetails.startupName}</p>
+          <p style="margin: 5px 0;"><strong>Role:</strong> ${registrationDetails.role.charAt(0).toUpperCase() + registrationDetails.role.slice(1)}</p>
+          <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ${status === 'approved' ? '#48bb78' : '#f56565'}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></p>
+          ${status === 'rejected' && rejectionReason ? `<p style="margin: 5px 0;"><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
+        </div>
+
+        ${status === 'approved' ? `
+          <div style="text-align: center; margin-top: 30px;">
+            <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/login" 
+               style="display: inline-block; background-color: #4299e1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+              Login to Your Account
+            </a>
+          </div>
+        ` : ''}
+      </div>
+    `
   })
 };
 
@@ -146,5 +207,15 @@ export const sendApprovalRequest = async (adminEmail, bookingDetails) => {
 
 export const sendApprovalStatus = async (userEmail, bookingDetails, status) => {
   const emailData = emailTemplates.approvalStatus({ ...bookingDetails, userEmail }, status)
+  return sendEmail(emailData)
+}
+
+export const sendRegistrationApprovalRequest = async (registrationDetails) => {
+  const emailData = emailTemplates.registrationApprovalRequest(registrationDetails)
+  return sendEmail(emailData)
+}
+
+export const sendRegistrationStatus = async (registrationDetails, status, rejectionReason = '') => {
+  const emailData = emailTemplates.registrationStatus(registrationDetails, status, rejectionReason)
   return sendEmail(emailData)
 } 

@@ -17,6 +17,7 @@ export default function Register() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -33,7 +34,7 @@ export default function Register() {
       })
 
       if (response.ok) {
-        router.push('/login')
+        setShowSuccessPopup(true)
       } else {
         const data = await response.json()
         setError(data.message || 'Registration failed')
@@ -218,6 +219,39 @@ export default function Register() {
           </form>
         </div>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Registration Successful!</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Your account has been created successfully. After admin approval, you will get access to the meeting room booking system.
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => router.push('/login')}
+                  className="flex-1 bg-gradient-to-r from-[#FF6B00] to-[#FF8F3F] text-white px-4 py-2 rounded-lg font-medium hover:from-[#FF8F3F] hover:to-[#FF6B00] transition-all duration-200"
+                >
+                  Go to Login
+                </button>
+                <button
+                  onClick={() => setShowSuccessPopup(false)}
+                  className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 

@@ -22,6 +22,8 @@ const calculateHours = (startTime, endTime) => {
 
 export default function UserDashboard() {
   const { data: session } = useSession()
+  // Helper to check if user is a fiire.org.in user
+  const isFiireUser = session?.user?.email?.endsWith('fiire.org.in');
   const [rooms, setRooms] = useState([])
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -377,6 +379,7 @@ export default function UserDashboard() {
 
   const getMonthlyBookedHours = () => {
     if (!selectedMonth) return '0.0';
+    if (isFiireUser) return 'Unlimited';
     
     const [year, month] = selectedMonth.split('-');
     const firstDayOfMonth = dayjs(`${year}-${month}-01`);
@@ -907,7 +910,7 @@ export default function UserDashboard() {
                     <div>
                       <p className="text-xs sm:text-sm font-medium text-[#FF6B00]">Monthly Booking Hours</p>
                       <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
-                        {getMonthlyBookedHours()} / 8 hours
+                        {getMonthlyBookedHours()} {isFiireUser ? '' : '/ 8 hours'}
                         <span className="text-xs sm:text-sm font-normal text-gray-500 ml-1 sm:ml-2">
                           ({dayjs(selectedMonth).format('MMMM YYYY')})
                         </span>

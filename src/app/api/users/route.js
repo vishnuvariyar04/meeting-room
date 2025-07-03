@@ -31,4 +31,52 @@ export async function GET(req) {
       { status: 500 }
     )
   }
+}
+
+export async function DELETE(req) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== 'admin') {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    await connectDB()
+
+    // Get userId from query params
+    const { searchParams } = new URL(req.url)
+    const userId = searchParams.get('id')
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'User ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Prevent deleting admin accounts
+    const user = await User.findById(userId)
+    if (!user) {
+      return NextResponse.json(
+        { message: 'User not found' },
+        { status: 404 }
+      )
+    }
+    if (user.role === 'admin') {
+      return NextResponse.json(
+        { message: 'Cannot delete admin accounts' },
+        { status: 403 }
+      )
+    }
+
+    await User.findByIdAndDelete(userId)
+    return NextResponse.json({ message: 'User deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    return NextResponse.json(
+      { message: 'Error deleting user' },
+      { status: 500 }
+    )
+  }
 } 

@@ -124,8 +124,9 @@ export async function POST(req) {
     console.log('New booking hours:', newBookingHours);
     console.log('Total after new booking:', totalMonthlyHours + newBookingHours);
 
-    // Check if adding new booking would exceed 8 hours
-    if (totalMonthlyHours + newBookingHours > 8) {
+    // Allow unlimited bookings for fiire.org.in users
+    const isFiireUser = session.user.email && session.user.email.endsWith('fiire.org.in');
+    if (!isFiireUser && totalMonthlyHours + newBookingHours > 8) {
       return NextResponse.json(
         { message: `You have already booked ${totalMonthlyHours.toFixed(1)} hours this month. Adding this booking of ${newBookingHours.toFixed(1)} hours would exceed the 8-hour limit. Please contact the admin for additional bookings.` },
         { status: 400 }

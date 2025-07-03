@@ -232,7 +232,7 @@ export default function Register() {
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Registration Successful!</h3>
               <p className="text-sm text-gray-600 mb-6">
-                Your account has been created successfully. After admin approval, you will get access to the meeting room booking system.
+                Your account has been created successfully. After admin approval, you will get access to the meeting room booking system. You will receive an email once your account is approved.
               </p>
               <div className="flex space-x-3">
                 <button

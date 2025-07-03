@@ -470,6 +470,26 @@ export default function AdminDashboard() {
     return options;
   };
 
+  // Add this function to handle user deletion
+  const handleDeleteUser = async (userEmail) => {
+    // Find the user in allUsers by email to get the correct _id
+    const userObj = allUsers.find(u => u.email === userEmail);
+    if (!userObj || !userObj._id) {
+      alert('Could not find user ID for deletion.');
+      return;
+    }
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/users?id=${userObj._id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to delete user');
+      fetchAllUsers();
+      alert('User deleted successfully');
+    } catch (err) {
+      alert(err.message || 'Error deleting user');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -1144,6 +1164,14 @@ export default function AdminDashboard() {
                                       {user.startupName}
                                     </span>
                                   )}
+                                  {/* Delete button */}
+                                  <button
+                                    title="Delete user"
+                                    onClick={() => handleDeleteUser(user.email)}
+                                    className="ml-2 p-2 rounded-full bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-800 transition-colors"
+                                  >
+                                    <FiTrash2 className="w-4 h-4" />
+                                  </button>
                                 </div>
                                 <div className="mt-2 flex items-center space-x-3">
                                   <div className="flex items-center text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
